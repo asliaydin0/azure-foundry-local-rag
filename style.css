@@ -1,0 +1,188 @@
+/* style.css - TechLas Orijinal Synthwave Tasarımı */
+
+/* 1. Ana Arka Plan: Derin Mor/Siyah ve Cyberpunk Izgara (Grid) Deseni */
+.stApp {
+    background-color: #05020B; /* Logodaki derin karanlık mor */
+    background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.07) 1px, transparent 1px),
+        radial-gradient(circle at top center, rgba(217, 38, 169, 0.15) 0%, transparent 60%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    background-attachment: fixed;
+    color: #E2E8F0;
+    font-family: 'Inter', sans-serif;
+}
+
+/* 2. Yan Panel (Sidebar): Koyu Mor ve Pembe Glow */
+[data-testid="stSidebar"] {
+    background-color: rgba(7, 3, 17, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(217, 38, 169, 0.3);
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    overflow-y: hidden !important;
+}
+
+/* 3. TechLas Logo Başlığı: Birebir Görseldeki Mor -> Cyan Geçişi */
+.techlas-title {
+    background: linear-gradient(90deg, #9328cd 0%, #00F0FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 3.8rem;
+    font-weight: 900;
+    margin-bottom: 0;
+    text-shadow: 0px 0px 25px rgba(217, 38, 169, 0.3); /* Logodaki halka ışıltısı */
+    letter-spacing: -1px;
+}
+
+.techlas-subtitle {
+    color: #948AA3;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* 4. Kaynaklar İçin Özel Scrollbar (Mor - Cyan Akışı) */
+.scrollable-sources {
+    max-height: 40vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    margin-bottom: 10px;
+}
+
+.scrollable-sources::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollable-sources::-webkit-scrollbar-track {
+    background: #0A0414;
+    border-radius: 10px;
+}
+.scrollable-sources::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #9328cd, #00F0FF);
+    border-radius: 10px;
+}
+
+/* 5. Dosya Kartları: Görseldeki Renklerle Etkileşim */
+.file-card {
+    background-color: rgba(14, 7, 29, 0.8);
+    border: 1px solid #231245;
+    border-left: 3px solid #9328cd; /* Görseldeki mor vurgu */
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    color: #D3CEE6;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.file-card:hover {
+    border-color: #00F0FF;
+    border-left: 4px solid #00F0FF; /* Üzerine gelince görseldeki cyan rengine döner */
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    color: #FFFFFF;
+    transform: translateX(4px);
+    background-color: rgba(21, 10, 43, 0.9);
+}
+
+/* 6. Mesaj Balonları ve Girdi Kutusu */
+[data-testid="stChatMessage"] {
+    background-color: rgba(12, 6, 23, 0.7);
+    backdrop-filter: blur(5px);
+    border: 1px solid #271447;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0, 0.4);
+}
+
+[data-testid="stChatInput"] {
+    background-color: rgba(12, 6, 23, 0.9);
+    border: 1px solid #271447;
+    border-radius: 15px;
+}
+
+[data-testid="stChatInput"]:focus-within {
+    border: 1px solid #00F0FF;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+/* 7. Canlı Status: Görseldeki Neon Camgöbeği (Cyan) */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 20px;
+    color: #00F0FF;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #00F0FF;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00F0FF;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(0, 240, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+}
+
+/* --- STREAMLIT VARSAYILAN BLOKLARINI ŞEFFAF YAPMA --- */
+
+/* Üst menü (Header) arka planını şeffaf yap */
+[data-testid="stHeader"] {
+    background-color: transparent !important;
+}
+
+/* Alt mesaj kutusunun (Chat Input) etrafındaki katı şeridi şeffaf yap */
+[data-testid="stBottom"] {
+    background-color: transparent !important;
+}
+
+[data-testid="stBottom"] > div {
+    background-color: transparent !important;
+}
+
+/* --- SIDEBAR SIKIŞTIRMA VE BOŞLUKLARI ALMA --- */
+
+/* 1. Sidebar Ana Kaydırma Çubuğunu Kesin Olarak Kapat ve Üst Boşluğu Sıfırla */
+section[data-testid="stSidebar"] > div {
+    overflow: hidden !important;
+    padding-top: 1.5rem !important; 
+}
+
+/* Sidebar içerik kutusunun iç boşluklarını sıfırla */
+div[data-testid="stSidebarUserContent"] {
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0px !important; /* Bileşenler arası otomatik boşluğu kapat */
+}
+
+/* 2. Dosya Yükleyiciyi (Uploader) İyice Sıkıştır */
+[data-testid="stFileUploadDropzone"] {
+    padding: 10px !important;
+    min-height: 60px !important;
+    background-color: rgba(14, 7, 29, 0.5) !important;
+    border: 1px dashed rgba(217, 38, 169, 0.5) !important;
+}
+
+/* Uploader içindeki gereksiz "200MB per file..." uyarısını tamamen gizle */
+[data-testid="stFileUploadDropzone"] small {
+    display: none !important;
+}
+
+/* 3. Taranan Kaynaklar Alanını Daha Da Daralt */
+.scrollable-sources {
+    max-height: 22vh !important; /* Kesinlikle ekrana sığması için 22vh'ye çektik */
+    overflow-y: auto !important;
+}
