@@ -151,38 +151,26 @@
     background-color: transparent !important;
 }
 
-/* --- SIDEBAR SIKIŞTIRMA VE BOŞLUKLARI ALMA --- */
+/* --- BAŞLIK VE ÇİZGİ BOŞLUKLARINI AYARLAMA --- */
 
-/* 1. Sidebar Ana Kaydırma Çubuğunu Kesin Olarak Kapat ve Üst Boşluğu Sıfırla */
-section[data-testid="stSidebar"] > div {
-    overflow: hidden !important;
-    padding-top: 1.5rem !important; 
+/* Sidebar içindeki başlıkların (Sistem Paneli, vb.) boşluklarını iyice daralt */
+[data-testid="stSidebar"] h3, 
+[data-testid="stSidebar"] h4 {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important; 
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
 }
 
-/* Sidebar içerik kutusunun iç boşluklarını sıfırla */
-div[data-testid="stSidebarUserContent"] {
-    padding-top: 0rem !important;
-    padding-bottom: 0rem !important;
-    display: flex;
-    flex-direction: column;
-    gap: 0px !important; /* Bileşenler arası otomatik boşluğu kapat */
+/* Kendi özel, ince neon ayraç çizgimiz ve etrafındaki boşluklar */
+.techlas-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(147, 40, 205, 0.5) 0%, rgba(0, 240, 255, 0.5) 100%);
+    margin: 5px 0px !important; 
 }
 
-/* 2. Dosya Yükleyiciyi (Uploader) İyice Sıkıştır */
-[data-testid="stFileUploadDropzone"] {
-    padding: 10px !important;
-    min-height: 60px !important;
-    background-color: rgba(14, 7, 29, 0.5) !important;
-    border: 1px dashed rgba(217, 38, 169, 0.5) !important;
-}
-
-/* Uploader içindeki gereksiz "200MB per file..." uyarısını tamamen gizle */
-[data-testid="stFileUploadDropzone"] small {
-    display: none !important;
-}
-
-/* 3. Taranan Kaynaklar Alanını Daha Da Daralt */
-.scrollable-sources {
-    max-height: 22vh !important; /* Kesinlikle ekrana sığması için 22vh'ye çektik */
-    overflow-y: auto !important;
+/* Sidebar içindeki varsayılan st.divider() çizgilerinin boşluklarını daralt */
+[data-testid="stSidebar"] hr {
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
 }
