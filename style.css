@@ -174,3 +174,51 @@
     margin-top: 8px !important;
     margin-bottom: 10px !important;
 }
+/* --- AÇILIR EKRAN (MODAL) BUTONU İÇİN SYNTHWAVE STİLİ --- */
+[data-testid="stButton"] button {
+    background-color: transparent !important;
+    border: 1px solid #D926A9 !important; /* Neon Mor çerçeve */
+    color: #00F0FF !important; /* Neon Cyan metin */
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-testid="stButton"] button:hover {
+    background-color: rgba(217, 38, 169, 0.15) !important;
+    border-color: #00F0FF !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4) !important; /* Üzerine gelince parlama */
+}
+/* --- PROFESYONEL SIDEBAR YERLEŞİMİ --- */
+
+/* Sidebar üst boşluğunu biraz daha estetik bir seviyeye çek (Çok yapışık olmasın) */
+section[data-testid="stSidebar"] > div {
+    padding-top: 2.5rem !important; 
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+/* Yeni Sistem Bilgi Kartı Tasarımı (Micro-Dashboard) */
+.info-card {
+    background: rgba(14, 7, 29, 0.4);
+    border: 1px solid rgba(217, 38, 169, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.85rem;
+    color: #E2E8F0;
+    line-height: 1.8;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    margin-bottom: 10px;
+}
+
+/* Çizgi boşluklarını ferahlat */
+.techlas-divider {
+    margin: 15px 0px !important; 
+}
+
+/* Başlık altı boşluklarını ferahlat */
+[data-testid="stSidebar"] h4 {
+    margin-bottom: 10px !important;
+    color: #D3CEE6 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.5px;
+}

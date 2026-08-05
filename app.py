@@ -14,26 +14,11 @@ try:
 except FileNotFoundError:
     st.warning("⚠️ 'style.css' dosyası bulunamadı.")
 
-# 2. Sidebar (Sol Menü) - Dosya Yükleme Özelliği İle
-with st.sidebar:
-    st.markdown("### ⚙️ Sistem Paneli")
-    st.caption("Veri Bağlantısı: Aktif")
-    st.divider()
+# --- YENİ: AÇILIR EKRAN (POPUP) FONKSİYONU ---
+@st.dialog("📋 Veritabanındaki Kaynaklar")
+def kaynaklari_goster():
+    st.markdown("Yapay zeka motorunun anlık olarak beslendiği dokümanlar:")
     
-    # --- DOSYA YÜKLEME ALANI ---
-    st.markdown("#### 📂 Yeni Kaynak Yükle")
-    yuklenen_dosya = st.file_uploader("PDF, TXT, MD veya DOCX", type=["pdf", "txt", "md", "docx"])
-    
-    if yuklenen_dosya is not None:
-        save_path = os.path.join(".", yuklenen_dosya.name)
-        with open(save_path, "wb") as f:
-            f.write(yuklenen_dosya.getbuffer())
-        st.success(f"✅ {yuklenen_dosya.name} eklendi!")
-    
-    st.divider()
-    
-    # --- ESKİ TARANAN KAYNAKLAR LİSTESİ ---
-    st.markdown("#### Taranan Kaynaklar")
     dosyalar = [
         "FullStack_Gelistirme_Notlari.md",
         "Frontend_Rehberi.pdf",
@@ -42,20 +27,62 @@ with st.sidebar:
         "YapayZeka_Optimizasyon_Makalesi.pdf"
     ]
     
-    html_content = '<div class="scrollable-sources">'
+    html_content = '<div class="scrollable-sources" style="max-height: 50vh;">'
     for dosya in dosyalar:
         html_content += f'<div class="file-card">📄 {dosya}</div>'
     html_content += '</div>'
     
     st.markdown(html_content, unsafe_allow_html=True)
-    
-    st.divider()
 
-    # Nefes alan animasyonlu durum bildirgesi
+# 2. Sidebar (Sol Menü)
+with st.sidebar:
+    # Marka ve Ana Durum
+    st.markdown("""
+        <div style='text-align: center; margin-bottom: 20px;'>
+            <h2 style='margin-bottom: 0px; background: linear-gradient(90deg, #D926A9, #00F0FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Sistem Paneli</h2>
+            <span style='color:#948AA3; font-size:0.85rem; font-weight: 300;'>TechLas Yerel Ağ Arayüzü</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
+    
+    # --- YENİ: SİSTEM BİLGİ KARTLARI (Micro-Dashboard) ---
+    st.markdown("#### Sistem Metrikleri")
+    st.markdown("""
+        <div class="info-card">
+            <div><span style='color:#948AA3'>Model:</span> <b>Phi-3.5-mini</b></div>
+            <div><span style='color:#948AA3'>Vektör DB:</span> <b>Chroma/FAISS</b></div>
+            <div><span style='color:#948AA3'>Ortam:</span> <b style='color:#00F0FF'>Localhost</b></div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
+    
+    # --- DOSYA YÜKLEME ALANI ---
+    st.markdown("#### Veritabanını Besle")
+    yuklenen_dosya = st.file_uploader("Dosya Yükle", type=["pdf", "txt", "md", "docx"], label_visibility="collapsed")
+    
+    if yuklenen_dosya is not None:
+        save_path = os.path.join(".", yuklenen_dosya.name)
+        with open(save_path, "wb") as f:
+            f.write(yuklenen_dosya.getbuffer())
+        st.success(f"✅ {yuklenen_dosya.name} indexlendi!")
+    
+    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
+    
+    # --- AÇILIR EKRAN BUTONU ---
+    st.markdown("#### Veri Yönetimi")
+    if st.button("🔗 Aktif Kaynakları İncele", use_container_width=True):
+        kaynaklari_goster()
+    
+    # Alt kısmı boş bırakıp en alta sabitlemek için boşluk
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # Canlı Durum Bildirgesi
     st.markdown('''
         <div class="status-indicator">
             <div class="status-dot"></div>
-            Sistem Aktif ve Hazır
+            Motor Çevrimiçi
         </div>
     ''', unsafe_allow_html=True)
 
@@ -104,12 +131,16 @@ if prompt := st.chat_input("Veritabanında aramak istediğiniz konuyu yazın..."
             bulunan_dokumanlar = retriever.search(prompt, top_k=2)
             baglam_metni = "\n\n".join([f"- Kaynak: {doc['source']}\n  İçerik: {doc['text']}" for doc in bulunan_dokumanlar])
             
-            system_prompt = f"""Sen sadece sana verilen dokümanları okuyabilen kısıtlı bir asistansın.
-Dış dünyadan veya kendi eğitim verinden HİÇBİR ŞEY BİLMİYORSUN.
+            # --- YENİ: KATI HALÜSİNASYON ENGELLEYİCİ PROMPT ---
+            system_prompt = f"""Sen TechLas firmasının resmi ve son derece katı kuralları olan yapay zeka asistanısın.
 
-KURAL 1: Sadece ama SADECE aşağıdaki BAĞLAM bölümünde yazan metinleri kullanarak cevap ver.
-KURAL 2: Eğer kullanıcının sorusunun cevabı aşağıdaki BAĞLAM içinde AÇIKÇA GEÇMİYORSA, kesinlikle hiçbir şey uydurma ve tam olarak şu cümleyi söyle: "Üzgünüm, sağlanan dokümanlarda bu sorunun cevabı bulunmamaktadır."
-KURAL 3: Bağlamda olmayan sahte bir dosya veya kaynak ismi ASLA üretme.
+GÖREVİN: 
+Kullanıcının sorusunu SADECE ama SADECE aşağıdaki BAĞLAM bölümünde verilen metinleri okuyarak cevaplamak.
+
+KESİN KURALLAR (BUNLARI İHLAL EDEMEZSİN):
+1. Eğer kullanıcının sorduğu soru BAĞLAM metninin içinde AÇIKÇA VE DOĞRUDAN geçmiyorsa, parçaları birleştirip tahmin yürütmek KESİNLİKLE YASAKTIR.
+2. Bağlamda cevabı olmayan sorular için SADECE şu cümleyi kuracaksın: "Üzgünüm, mevcut veritabanımda bu konu hakkında bir bilgi bulunmuyor." Başka hiçbir kelime ekleme.
+3. Asla sahte tanımlar üretme.
 
 BAĞLAM:
 {baglam_metni}
