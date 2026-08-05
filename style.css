@@ -190,11 +190,33 @@
 }
 /* --- PROFESYONEL SIDEBAR YERLEŞİMİ --- */
 
-/* Sidebar üst boşluğunu biraz daha estetik bir seviyeye çek (Çok yapışık olmasın) */
+/* 1. Sidebar Ana Kaydırma Çubuğunu Aç ve Özelleştir */
 section[data-testid="stSidebar"] > div {
+    overflow-y: auto !important; /* Gizlemeyi iptal ettik, dikey kaydırmayı açtık */
+    overflow-x: hidden !important;
     padding-top: 2.5rem !important; 
     padding-left: 1rem !important;
     padding-right: 1rem !important;
+}
+
+/* Sidebar Scrollbar Tasarımı (İnce Synthwave Çizgisi) */
+section[data-testid="stSidebar"] > div::-webkit-scrollbar {
+    width: 4px; /* Çok ince ve zarif bir bar */
+}
+section[data-testid="stSidebar"] > div::-webkit-scrollbar-track {
+    background: transparent; /* Arka planı şeffaf yapıp kalabalığı önlüyoruz */
+}
+section[data-testid="stSidebar"] > div::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #D926A9, #00F0FF); /* Mor-Cyan gradyan */
+    border-radius: 10px;
+}
+
+/* Dosya yüklendiğinde uploader'ın aldığı gri arka planı transparan ve şık yap */
+[data-testid="stUploadedFile"] {
+    background-color: rgba(14, 7, 29, 0.6) !important;
+    border: 1px solid rgba(0, 240, 255, 0.3) !important;
+    border-radius: 8px !important;
+    color: #E2E8F0 !important;
 }
 
 /* Yeni Sistem Bilgi Kartı Tasarımı (Micro-Dashboard) */

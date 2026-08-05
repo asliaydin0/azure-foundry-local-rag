@@ -59,14 +59,15 @@ with st.sidebar:
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
     
     # --- DOSYA YÜKLEME ALANI ---
-    st.markdown("#### Veritabanını Besle")
+    st.markdown("#### 📂 Veritabanını Besle")
     yuklenen_dosya = st.file_uploader("Dosya Yükle", type=["pdf", "txt", "md", "docx"], label_visibility="collapsed")
     
     if yuklenen_dosya is not None:
         save_path = os.path.join(".", yuklenen_dosya.name)
         with open(save_path, "wb") as f:
             f.write(yuklenen_dosya.getbuffer())
-        st.success(f"✅ {yuklenen_dosya.name} indexlendi!")
+        # sağ alttan popup çıkar
+        st.toast(f"{yuklenen_dosya.name} başarıyla eklendi!", icon="✅")
     
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
     
