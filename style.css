@@ -758,10 +758,32 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     box-shadow: 0 0 12px rgba(0, 240, 255, 0.15) !important;
 }
 
-/* Silme Diyalogu */
-.dialog-warning {
+/* Silme onay kutusu — modal içi inline */
+.delete-confirm-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(217, 38, 169, 0.08);
+    border: 1px solid rgba(217, 38, 169, 0.35);
+    border-left: 3px solid #D926A9;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+}
+
+.delete-confirm-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #FF6EC7;
+    letter-spacing: 0.5px;
+}
+
+.delete-confirm-text {
+    font-size: 0.68rem;
     color: #D3CEE6;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    padding: 8px 0 16px 0;
+    line-height: 1.4;
+}
+
+[data-testid="stDialog"] [data-testid="stHorizontalBlock"]:has(button[kind="primary"]) {
+    margin-bottom: 8px !important;
 }

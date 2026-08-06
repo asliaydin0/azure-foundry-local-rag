@@ -26,8 +26,8 @@ if "son_yuklenen" not in st.session_state:
     st.session_state.son_yuklenen = None
 if "son_silinen" not in st.session_state:
     st.session_state.son_silinen = None
-if "silme_onay" not in st.session_state:
-    st.session_state.silme_onay = None
+if "silme_bekleyen" not in st.session_state:
+    st.session_state.silme_bekleyen = None
 
 # Bildirimler
 if st.session_state.son_yuklenen:
@@ -71,6 +71,12 @@ def hafizaya_ekle(dosya_adi: str) -> int:
         raise FileNotFoundError(f"'{dosya_adi}' bulunamadı.")
     return ingest_file(path, retriever.embedder, dosya_adi)
 
+
+def kaynaktan_sil(dosya_adi: str) -> None:
+    """Dosyayı diskten ve vektör hafızasından kaldırır."""
+    if not delete_document(dosya_adi):
+        raise FileNotFoundError(f"'{dosya_adi}' silinemedi veya bulunamadı.")
+
 # --- KAYNAK KÜTÜPHANESİ DİYALOGU ---
 @st.dialog("📂 Kaynak Kütüphanesi", width="small")
 def kaynak_kutuphanesi_goster():
@@ -93,6 +99,29 @@ def kaynak_kutuphanesi_goster():
         return
 
     for i, kaynak in enumerate(kaynaklar):
+        if st.session_state.silme_bekleyen == kaynak["name"]:
+            st.markdown(f"""
+                <div class="delete-confirm-box">
+                    <span class="delete-confirm-title">🗑️ Silme Onayı</span>
+                    <span class="delete-confirm-text"><b>{kaynak["name"]}</b> ve hafızadaki tüm bölümleri kalıcı olarak silinecek.</span>
+                </div>
+            """, unsafe_allow_html=True)
+            onay_col, iptal_col = st.columns(2)
+            with onay_col:
+                if st.button("Evet, Sil", key=f"confirm_del_{i}", use_container_width=True, type="primary"):
+                    try:
+                        kaynaktan_sil(kaynak["name"])
+                        st.session_state.son_silinen = kaynak["name"]
+                        st.session_state.silme_bekleyen = None
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Silinemedi: {e}")
+            with iptal_col:
+                if st.button("İptal", key=f"cancel_del_{i}", use_container_width=True):
+                    st.session_state.silme_bekleyen = None
+                    st.rerun()
+            continue
+
         durum_class = "indexed" if kaynak["indexed"] else "pending"
         durum_text = f'{kaynak["chunks"]} bölüm okundu' if kaynak["indexed"] else "Henüz okunmadı"
 
@@ -127,26 +156,8 @@ def kaynak_kutuphanesi_goster():
 
         with action_cols[2]:
             if st.button("Sil", key=f"dlg_del_{i}", use_container_width=True):
-                silme_onay_goster(kaynak["name"])
-
-# --- SİLME ONAY DİYALOGU ---
-@st.dialog("🗑️ Kaynağı Kaldır")
-def silme_onay_goster(dosya_adi: str):
-    st.markdown(
-        f'<p class="dialog-warning">**{dosya_adi}** dosyası ve veritabanındaki tüm parçaları kalıcı olarak silinecek.</p>',
-        unsafe_allow_html=True,
-    )
-    col_evet, col_iptal = st.columns(2)
-    with col_evet:
-        if st.button("Evet, Sil", use_container_width=True, type="primary", key="dialog_confirm_del"):
-            delete_document(dosya_adi)
-            st.session_state.son_silinen = dosya_adi
-            st.session_state.silme_onay = None
-            st.rerun()
-    with col_iptal:
-        if st.button("İptal", use_container_width=True, key="dialog_cancel_del"):
-            st.session_state.silme_onay = None
-            st.rerun()
+                st.session_state.silme_bekleyen = kaynak["name"]
+                st.rerun()
 
 # 3. Sidebar — Profesyonel Kontrol Paneli
 kaynaklar, toplam_parca = get_library_stats()
