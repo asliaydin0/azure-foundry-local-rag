@@ -66,7 +66,9 @@ with st.spinner("Sistem başlatılıyor..."):
 
 def hafizaya_ekle(dosya_adi: str) -> int:
     """Dosyayı okur, vektörleştirir ve hafızaya yazar."""
-    path = os.path.join(".", dosya_adi)
+    from document_manager import DOCS_DIR, ensure_docs_dir
+    ensure_docs_dir()
+    path = os.path.join(DOCS_DIR, dosya_adi)
     if not os.path.exists(path):
         raise FileNotFoundError(f"'{dosya_adi}' bulunamadı.")
     return ingest_file(path, retriever.embedder, dosya_adi)
@@ -77,8 +79,37 @@ def kaynaktan_sil(dosya_adi: str) -> None:
     if not delete_document(dosya_adi):
         raise FileNotFoundError(f"'{dosya_adi}' silinemedi veya bulunamadı.")
 
+
+def _kutuphane_kapatildi() -> None:
+    st.session_state.silme_bekleyen = None
+
+
+def _silme_onay_ekrani(dosya_adi: str) -> None:
+    """Silme onayını liste dışında gösterir; işlem sonrası fragment yenilenir."""
+    st.markdown(f"""
+        <div class="delete-confirm-box">
+            <span class="delete-confirm-title">🗑️ Silme Onayı</span>
+            <span class="delete-confirm-text"><b>{dosya_adi}</b> ve hafızadaki tüm bölümleri kalıcı olarak silinecek.</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+    onay_col, iptal_col = st.columns(2)
+    with onay_col:
+        if st.button("Evet, Sil", key="confirm_del_active", use_container_width=True, type="primary"):
+            try:
+                kaynaktan_sil(dosya_adi)
+                st.session_state.silme_bekleyen = None
+                st.toast(f"🗑️ {dosya_adi} kaldırıldı", icon="✅")
+                st.rerun(scope="fragment")
+            except Exception as e:
+                st.error(f"Silinemedi: {e}")
+    with iptal_col:
+        if st.button("İptal", key="cancel_del_active", use_container_width=True):
+            st.session_state.silme_bekleyen = None
+            st.rerun(scope="fragment")
+
 # --- KAYNAK KÜTÜPHANESİ DİYALOGU ---
-@st.dialog("📂 Kaynak Kütüphanesi", width="small")
+@st.dialog("📂 Kaynak Kütüphanesi", width="small", on_dismiss=_kutuphane_kapatildi)
 def kaynak_kutuphanesi_goster():
     kaynaklar, toplam_parca = get_library_stats()
     hafizada_count = sum(1 for k in kaynaklar if k["indexed"])
@@ -98,38 +129,22 @@ def kaynak_kutuphanesi_goster():
         """, unsafe_allow_html=True)
         return
 
-    for i, kaynak in enumerate(kaynaklar):
-        if st.session_state.silme_bekleyen == kaynak["name"]:
-            st.markdown(f"""
-                <div class="delete-confirm-box">
-                    <span class="delete-confirm-title">🗑️ Silme Onayı</span>
-                    <span class="delete-confirm-text"><b>{kaynak["name"]}</b> ve hafızadaki tüm bölümleri kalıcı olarak silinecek.</span>
-                </div>
-            """, unsafe_allow_html=True)
-            onay_col, iptal_col = st.columns(2)
-            with onay_col:
-                if st.button("Evet, Sil", key=f"confirm_del_{i}", use_container_width=True, type="primary"):
-                    try:
-                        kaynaktan_sil(kaynak["name"])
-                        st.session_state.son_silinen = kaynak["name"]
-                        st.session_state.silme_bekleyen = None
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Silinemedi: {e}")
-            with iptal_col:
-                if st.button("İptal", key=f"cancel_del_{i}", use_container_width=True):
-                    st.session_state.silme_bekleyen = None
-                    st.rerun()
-            continue
+    bekleyen_silme = st.session_state.silme_bekleyen
+    if bekleyen_silme:
+        if any(k["name"] == bekleyen_silme for k in kaynaklar):
+            _silme_onay_ekrani(bekleyen_silme)
+            return
+        st.session_state.silme_bekleyen = None
 
+    for i, kaynak in enumerate(kaynaklar):
         durum_class = "indexed" if kaynak["indexed"] else "pending"
         durum_text = f'{kaynak["chunks"]} bölüm okundu' if kaynak["indexed"] else "Henüz okunmadı"
 
         if kaynak["indexed"]:
-            info_col, del_col = st.columns([5.5, 1.3])
+            info_col, del_col = st.columns([4.8, 1.6])
             action_cols = (info_col, None, del_col)
         else:
-            info_col, teach_col, del_col = st.columns([4, 2.2, 1.3])
+            info_col, teach_col, del_col = st.columns([3.4, 3.2, 1.5])
             action_cols = (info_col, teach_col, del_col)
 
         with action_cols[0]:
@@ -145,19 +160,21 @@ def kaynak_kutuphanesi_goster():
 
         if action_cols[1] is not None:
             with action_cols[1]:
-                if st.button("Hafızaya Ekle", key=f"dlg_teach_{i}", use_container_width=True):
+                if st.button("➕ Hafızaya Ekle", key=f"dlg_teach_{i}", use_container_width=True, help="Asistana öğret"):
                     try:
                         with st.spinner("Hafızaya ekleniyor..."):
                             parca = hafizaya_ekle(kaynak["name"])
-                        st.session_state.son_yuklenen = (kaynak["name"], parca)
-                        st.rerun()
+                        if parca > 0:
+                            st.toast(f"✅ {kaynak['name']} — {parca} bölüm hafızaya eklendi", icon="📚")
+                        else:
+                            st.toast(f"⚠️ {kaynak['name']} kaydedildi ancak metin çıkarılamadı", icon="⚠️")
                     except Exception as e:
                         st.error(f"Hafızaya eklenemedi: {e}")
 
         with action_cols[2]:
-            if st.button("Sil", key=f"dlg_del_{i}", use_container_width=True):
+            if st.button("🗑 Sil", key=f"dlg_del_{i}", use_container_width=True, help="Kaynağı kaldır"):
                 st.session_state.silme_bekleyen = kaynak["name"]
-                st.rerun()
+                st.rerun(scope="fragment")
 
 # 3. Sidebar — Profesyonel Kontrol Paneli
 kaynaklar, toplam_parca = get_library_stats()
@@ -211,7 +228,9 @@ with st.sidebar:
     )
 
     if yuklenen_dosya is not None:
-        save_path = os.path.join(".", yuklenen_dosya.name)
+        from document_manager import DOCS_DIR, ensure_docs_dir
+        ensure_docs_dir()
+        save_path = os.path.join(DOCS_DIR, yuklenen_dosya.name)
         with open(save_path, "wb") as f:
             f.write(yuklenen_dosya.getbuffer())
 

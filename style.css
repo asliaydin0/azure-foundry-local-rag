@@ -602,7 +602,8 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 .source-row-inline {
-    min-height: 38px;
+    min-height: 26px;
+    padding: 5px 9px;
 }
 
 /* Diyalog — dosya satırı + butonlar yatay hizalı */
@@ -612,7 +613,7 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 [data-testid="stDialog"] [data-testid="stHorizontalBlock"] {
-    gap: 0.35rem !important;
+    gap: 0.4rem !important;
     margin-bottom: 5px !important;
     padding-bottom: 0 !important;
 }
@@ -620,6 +621,14 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 [data-testid="stDialog"] [data-testid="stHorizontalBlock"] > [data-testid="column"] {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+}
+
+/* Buton sarmalayıcı — dikey boşluk sıfır */
+[data-testid="stDialog"] [data-testid="column"] [data-testid="stButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
 }
 
 .source-row.indexed {
@@ -666,38 +675,50 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     letter-spacing: 0.1px;
 }
 
-/* Diyalog mini butonları — ince outline, yatay hizalı */
+/* Diyalog aksiyon butonları — ince yatay pill */
 [data-testid="stDialog"] [data-testid="column"] button {
-    font-size: 0.62rem !important;
-    padding: 2px 5px !important;
-    min-height: 26px !important;
-    height: 26px !important;
-    margin-bottom: 0 !important;
-    line-height: 1.1 !important;
+    font-size: 0.6rem !important;
+    padding: 0 10px !important;
+    min-height: 22px !important;
+    height: 22px !important;
+    max-height: 22px !important;
+    margin: 0 !important;
+    line-height: 1 !important;
     white-space: nowrap !important;
+    border-radius: 5px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
 }
 
+/* Hafızaya Ekle — sağa uzanan ince buton */
 [data-testid="stDialog"] [data-testid="column"]:nth-child(2):not(:last-child) button {
-    border-color: rgba(0, 240, 255, 0.4) !important;
+    border-color: rgba(0, 240, 255, 0.45) !important;
     color: #00F0FF !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.05px;
 }
 
 [data-testid="stDialog"] [data-testid="column"]:nth-child(2):not(:last-child) button:hover {
-    background-color: rgba(0, 240, 255, 0.08) !important;
+    background-color: rgba(0, 240, 255, 0.1) !important;
     border-color: #00F0FF !important;
-    box-shadow: 0 0 8px rgba(0, 240, 255, 0.25) !important;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.28) !important;
 }
 
+/* Sil — ince yatay çöp kutusu butonu */
 [data-testid="stDialog"] [data-testid="column"]:last-child button {
-    border-color: rgba(217, 38, 169, 0.45) !important;
+    border-color: rgba(217, 38, 169, 0.5) !important;
     color: #D926A9 !important;
-    min-width: 36px !important;
+    font-size: 0.58rem !important;
+    padding: 0 8px !important;
 }
 
 [data-testid="stDialog"] [data-testid="column"]:last-child button:hover {
-    background-color: rgba(217, 38, 169, 0.12) !important;
+    background-color: rgba(217, 38, 169, 0.14) !important;
     border-color: #D926A9 !important;
-    box-shadow: 0 0 8px rgba(217, 38, 169, 0.25) !important;
+    box-shadow: 0 0 10px rgba(217, 38, 169, 0.28) !important;
     color: #FF6EC7 !important;
 }
 

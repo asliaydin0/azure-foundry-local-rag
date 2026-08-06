@@ -7,7 +7,21 @@ from database import DB_NAME, init_db
 SUPPORTED_EXTENSIONS = (".pdf", ".txt", ".md", ".docx")
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
-DOCS_DIR = "."
+DOCS_DIR = "documents"
+
+# Proje kökündeki dosyalar asla kaynak kütüphanesinde listelenmez / silinmez
+PROTECTED_FILENAMES = {
+    "requirements.txt",
+    "README.md",
+    "app.py",
+    "main.py",
+    "style.css",
+}
+
+
+def ensure_docs_dir() -> None:
+    os.makedirs(DOCS_DIR, exist_ok=True)
+
 
 EXT_ICONS = {
     ".pdf": "📕",
@@ -26,11 +40,13 @@ def format_size(size_bytes: int) -> str:
 
 
 def get_supported_files() -> list[str]:
+    ensure_docs_dir()
     if not os.path.isdir(DOCS_DIR):
         return []
     return sorted(
         f for f in os.listdir(DOCS_DIR)
         if f.lower().endswith(SUPPORTED_EXTENSIONS)
+        and f not in PROTECTED_FILENAMES
     )
 
 
@@ -124,6 +140,10 @@ def ingest_file(filepath: str, embedder, source_name=None) -> int:
 
 
 def delete_document(filename: str) -> bool:
+    if filename in PROTECTED_FILENAMES:
+        raise PermissionError(f"'{filename}' proje dosyasıdır, silinemez.")
+
+    ensure_docs_dir()
     filepath = os.path.join(DOCS_DIR, filename)
     init_db()
     conn = sqlite3.connect(DB_NAME)
