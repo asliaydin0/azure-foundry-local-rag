@@ -354,6 +354,7 @@ KESİN KURALLAR (BUNLARI İHLAL EDEMEZSİN):
 1. Eğer kullanıcının sorduğu soru BAĞLAM metninin içinde AÇIKÇA VE DOĞRUDAN geçmiyorsa, parçaları birleştirip tahmin yürütmek KESİNLİKLE YASAKTIR.
 2. Bağlamda cevabı olmayan sorular için SADECE şu cümleyi kuracaksın: "Üzgünüm, mevcut veritabanımda bu konu hakkında bir bilgi bulunmuyor." Başka hiçbir kelime ekleme.
 3. Asla sahte tanımlar üretme.
+4. Cevabına KESİNLİKLE "Kaynak:", "İçerik:", veya "Belge:" gibi kelimelerle başlama. Sana sunulan bağlamdaki (context) meta verileri veya dosya isimlerini asla metnin içine yazma. Sadece doğrudan ve doğal bir asistan gibi sorunun cevabını ver. Kaynaklar zaten sistem tarafından arayüzde ayrıca gösterilmektedir.
 
 BAĞLAM:
 {baglam_metni}

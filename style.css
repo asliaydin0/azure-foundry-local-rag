@@ -523,9 +523,40 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     border: 1px dashed rgba(147, 40, 205, 0.5) !important;
 }
 
-/* Uploader İçindeki "200MB per file" İbaresini Gizle */
-[data-testid="stFileUploadDropzone"] small {
-    display: none !important; 
+/* Uploader İçindeki "200MB per file" İbaresini Gizle — tüm Streamlit DOM varyantları */
+[data-testid="stSidebar"] [data-testid="stFileUploader"] small,
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] small,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] small,
+[data-testid="stSidebar"] section[data-testid="stFileUploadDropzone"] small,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzoneInstructions"] small,
+[data-testid="stSidebar"] [data-testid="stFileDropzoneInstructions"] small,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzoneInstructions"] > div > small,
+[data-testid="stSidebar"] [data-testid="stFileDropzoneInstructions"] > div > small,
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] div div small,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] div div small,
+[data-testid="stSidebar"] [data-testid="stFileUploader"] [data-testid="stCaptionContainer"],
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] [data-testid="stCaptionContainer"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Limit metni bazı sürümlerde span veya ::after ile gelir */
+[data-testid="stSidebar"] [data-testid="stFileDropzoneInstructions"] > div > small,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzoneInstructions"] > div > span:last-child,
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] div div::after,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] div div::after {
+    display: none !important;
+    content: none !important;
+    visibility: hidden !important;
 }
 
 /* Anlık Yüklenen Dosyanın Gri Kutusunu Transparan Yap */
@@ -933,12 +964,7 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
-/* Uploader alt metnini sidebar'da gizle (Streamlit varsayılan) */
-[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] small,
-[data-testid="stSidebar"] [data-testid="stFileUploader"] small {
-    display: none !important;
-}
-
+/* Uploader alt metnini sidebar'da gizle — yukarıdaki kapsamlı kurallarla birlikte */
 [data-testid="stSidebar"] [data-testid="stFileUploadDropzone"]:hover {
     border-color: rgba(0, 240, 255, 0.5) !important;
     box-shadow: 0 0 12px rgba(0, 240, 255, 0.15) !important;
