@@ -63,6 +63,14 @@ def load_ai_system():
 with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
 
+
+def hafizaya_ekle(dosya_adi: str) -> int:
+    """Dosyayı okur, vektörleştirir ve hafızaya yazar."""
+    path = os.path.join(".", dosya_adi)
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"'{dosya_adi}' bulunamadı.")
+    return ingest_file(path, retriever.embedder, dosya_adi)
+
 # --- KAYNAK KÜTÜPHANESİ DİYALOGU ---
 @st.dialog("📂 Kaynak Kütüphanesi", width="small")
 def kaynak_kutuphanesi_goster():
@@ -109,11 +117,13 @@ def kaynak_kutuphanesi_goster():
         if action_cols[1] is not None:
             with action_cols[1]:
                 if st.button("Hafızaya Ekle", key=f"dlg_teach_{i}", use_container_width=True):
-                    with st.spinner("Hafızaya ekleniyor..."):
-                        path = os.path.join(".", kaynak["name"])
-                        parca = ingest_file(path, retriever.embedder, kaynak["name"])
-                    st.session_state.son_yuklenen = (kaynak["name"], parca)
-                    st.rerun()
+                    try:
+                        with st.spinner("Hafızaya ekleniyor..."):
+                            parca = hafizaya_ekle(kaynak["name"])
+                        st.session_state.son_yuklenen = (kaynak["name"], parca)
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Hafızaya eklenemedi: {e}")
 
         with action_cols[2]:
             if st.button("Sil", key=f"dlg_del_{i}", use_container_width=True):
@@ -195,7 +205,7 @@ with st.sidebar:
             f.write(yuklenen_dosya.getbuffer())
 
         with st.spinner("Hafızaya ekleniyor..."):
-            parca_sayisi = ingest_file(save_path, retriever.embedder, yuklenen_dosya.name)
+            parca_sayisi = hafizaya_ekle(yuklenen_dosya.name)
 
         st.session_state.son_yuklenen = (yuklenen_dosya.name, parca_sayisi)
         st.session_state.uploader_key += 1
