@@ -43,14 +43,19 @@
     margin-bottom: 2rem;
 }
 
-/* 4. AÇILIR EKRAN (MODAL) İÇİ KAYNAK LİSTESİ SCROLLBAR'I */
+/* 4. AÇILIR EKRAN (MODAL) — Kompakt boyut ve scroll */
+[data-testid="stDialog"],
+[data-testid="stModal"] > div {
+    max-width: 440px !important;
+}
+
 .scrollable-sources,
 [data-testid="stDialog"] > div > div,
 [data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"] {
-    max-height: 60vh !important;
+    max-height: 52vh !important;
     overflow-y: auto !important;
-    padding-right: 8px;
-    margin-bottom: 10px;
+    padding-right: 6px;
+    margin-bottom: 6px;
 }
 
 .scrollable-sources::-webkit-scrollbar,
@@ -155,33 +160,86 @@
     background-color: transparent !important;
 }
 
-/* Sidebar — scroll dış katmanda, sağ kenarda tam boy */
+/* Sidebar collapse başlığı — üst boşluk yok */
+[data-testid="stSidebar"] [data-testid="stSidebarHeader"],
+[data-testid="stSidebar"] [data-testid="stLogoSpacer"] {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+/* Sidebar — minimal padding, tek ekrana sığdır */
+section[data-testid="stSidebar"] {
+    padding: 0 !important;
+}
+
 section[data-testid="stSidebar"] > div {
     height: 100% !important;
     max-height: 100vh !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding-top: 2.5rem !important;
-    padding-left: 1rem !important;
-    padding-right: 0.35rem !important;
-    padding-bottom: 1.5rem !important;
+    padding-top: 0.35rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.25rem !important;
+    padding-bottom: 0.35rem !important;
     box-sizing: border-box !important;
     scrollbar-width: thin;
     scrollbar-color: #9328cd transparent;
 }
 
-/* İç katmanlar kendi scrollbar'ını taşımasın */
+/* İç katmanlar — Streamlit varsayılan boşluklarını sıfırla */
 [data-testid="stSidebarContent"],
 div[data-testid="stSidebarUserContent"] {
     overflow: visible !important;
     overflow-x: hidden !important;
     height: auto !important;
     max-height: none !important;
-    padding-top: 0rem !important;
-    padding-bottom: 0rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
     display: flex;
     flex-direction: column;
-    gap: 0px !important;
+    gap: 0 !important;
+}
+
+/* Sidebar içi blok aralıkları */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"],
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] {
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div,
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] > div {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stElementContainer"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"] [data-testid="stMarkdown"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploader"],
+[data-testid="stSidebar"] [data-testid="stButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Son bileşen alt boşluğu yok */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div:last-child,
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] > div:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 /* Dış scrollbar — sidebar'ın en sağ kenarı, tam yükseklik */
@@ -210,7 +268,11 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 .techlas-divider {
     height: 1px;
     background: linear-gradient(90deg, rgba(147, 40, 205, 0.5) 0%, rgba(0, 240, 255, 0.5) 100%);
-    margin: 15px 0px !important; 
+    margin: 15px 0px !important;
+}
+
+[data-testid="stSidebar"] .techlas-divider {
+    margin: 5px 0 !important;
 }
 
 /* Sidebar İçi Başlıkların Varsayılan Boşluklarını Ezme */
@@ -259,8 +321,8 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 
 /* Dosya Yükleyici (Uploader) Sıkıştırma */
 [data-testid="stFileUploadDropzone"] {
-    padding: 10px !important;
-    min-height: 60px !important;
+    padding: 8px !important;
+    min-height: 52px !important;
     background-color: rgba(14, 7, 29, 0.5) !important;
     border: 1px dashed rgba(147, 40, 205, 0.5) !important;
 }
@@ -286,21 +348,21 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 4px 0 8px 0;
+    gap: 8px;
+    padding: 0 0 2px 0;
 }
 
 .brand-icon {
-    width: 42px;
-    height: 42px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     background: linear-gradient(135deg, rgba(147, 40, 205, 0.25), rgba(0, 240, 255, 0.15));
     border: 1px solid rgba(147, 40, 205, 0.4);
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(147, 40, 205, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 0 14px rgba(147, 40, 205, 0.2);
 }
 
 .brand-text {
@@ -310,7 +372,7 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 .brand-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 800;
     background: linear-gradient(90deg, #D926A9, #00F0FF);
     -webkit-background-clip: text;
@@ -319,25 +381,46 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 .brand-sub {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #948AA3;
     font-weight: 400;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
+}
+
+/* Micro-Dashboard — tek kompakt kart */
+.micro-dashboard {
+    background: rgba(14, 7, 29, 0.55);
+    border: 1px solid rgba(147, 40, 205, 0.22);
+    border-radius: 8px;
+    padding: 8px;
+    backdrop-filter: blur(4px);
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.35);
+}
+
+.micro-dashboard .metrics-grid {
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.micro-dashboard .system-info-row {
+    gap: 4px;
+    margin-bottom: 0;
+    justify-content: center;
 }
 
 /* Metrik Grid */
 .metrics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 6px;
+    margin-bottom: 0;
 }
 
 .metric-card {
-    background: rgba(14, 7, 29, 0.6);
-    border: 1px solid rgba(147, 40, 205, 0.25);
-    border-radius: 10px;
-    padding: 14px 12px;
+    background: rgba(10, 4, 20, 0.6);
+    border: 1px solid rgba(147, 40, 205, 0.2);
+    border-radius: 7px;
+    padding: 7px 6px;
     text-align: center;
     transition: border-color 0.3s ease;
 }
@@ -348,19 +431,19 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 
 .metric-value {
     display: block;
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: #00F0FF;
     line-height: 1;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .metric-label {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.62rem;
     color: #948AA3;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     font-weight: 600;
 }
 
@@ -368,20 +451,20 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 .system-info-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 4px;
+    margin-bottom: 0;
 }
 
 .info-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.72rem;
+    gap: 5px;
+    font-size: 0.65rem;
     color: #B8AED0;
-    background: rgba(14, 7, 29, 0.5);
-    border: 1px solid rgba(39, 20, 71, 0.8);
+    background: rgba(10, 4, 20, 0.5);
+    border: 1px solid rgba(39, 20, 71, 0.7);
     border-radius: 20px;
-    padding: 4px 10px;
+    padding: 2px 8px;
 }
 
 .tag-dot {
@@ -403,20 +486,20 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 
 /* Bölüm Başlıkları */
 .sidebar-section-title {
-    font-size: 0.82rem !important;
+    font-size: 0.75rem !important;
     font-weight: 700 !important;
     color: #D3CEE6 !important;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin: 0 0 4px 0 !important;
+    letter-spacing: 1px;
+    margin: 0 0 2px 0 !important;
     padding: 0 !important;
 }
 
 .sidebar-section-hint {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #6B6080;
-    margin: 0 0 10px 0;
-    letter-spacing: 0.5px;
+    margin: 0 0 4px 0;
+    letter-spacing: 0.3px;
 }
 
 .section-count {
@@ -438,16 +521,16 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 24px 16px;
+    gap: 4px;
+    padding: 16px 12px;
     background: rgba(14, 7, 29, 0.4);
     border: 1px dashed rgba(147, 40, 205, 0.3);
-    border-radius: 10px;
-    margin-bottom: 8px;
+    border-radius: 8px;
+    margin-bottom: 4px;
 }
 
 .empty-icon {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     opacity: 0.5;
 }
 
@@ -465,15 +548,36 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 /* Kaynak Satırları */
 .source-row {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
     background: rgba(14, 7, 29, 0.7);
     border: 1px solid #231245;
     border-left: 3px solid #9328cd;
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
+    border-radius: 7px;
+    padding: 7px 9px;
+    margin-bottom: 0;
     transition: all 0.25s ease;
+}
+
+.source-row-inline {
+    min-height: 38px;
+}
+
+/* Diyalog — dosya satırı + butonlar yatay hizalı */
+[data-testid="stDialog"] [data-testid="stHorizontalBlock"],
+[data-testid="stDialog"] [data-testid="column"] {
+    align-items: center !important;
+}
+
+[data-testid="stDialog"] [data-testid="stHorizontalBlock"] {
+    gap: 0.35rem !important;
+    margin-bottom: 5px !important;
+    padding-bottom: 0 !important;
+}
+
+[data-testid="stDialog"] [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .source-row.indexed {
@@ -492,21 +596,20 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 .source-icon {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     flex-shrink: 0;
-    margin-top: 1px;
 }
 
 .source-details {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 1px;
     min-width: 0;
     flex: 1;
 }
 
 .source-name {
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 600;
     color: #E2E8F0;
     white-space: nowrap;
@@ -516,66 +619,92 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 .source-meta {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     color: #948AA3;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
 }
 
-/* Kaynak Aksiyon Butonları — Diyalog içi (İndeksle / Sil) */
-[data-testid="stDialog"] [data-testid="column"]:last-child button,
-.stDialog [data-testid="column"]:last-child button {
-    border-color: rgba(217, 38, 169, 0.5) !important;
-    color: #D926A9 !important;
+/* Diyalog mini butonları — ince outline, yatay hizalı */
+[data-testid="stDialog"] [data-testid="column"] button {
+    font-size: 0.62rem !important;
+    padding: 2px 5px !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    margin-bottom: 0 !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
 }
 
-[data-testid="stDialog"] [data-testid="column"]:last-child button:hover,
-.stDialog [data-testid="column"]:last-child button:hover {
-    background-color: rgba(217, 38, 169, 0.15) !important;
-    border-color: #D926A9 !important;
-    box-shadow: 0 0 10px rgba(217, 38, 169, 0.3) !important;
-    color: #FF6EC7 !important;
-}
-
-[data-testid="stDialog"] [data-testid="column"]:first-child button,
-.stDialog [data-testid="column"]:first-child button {
-    border-color: rgba(0, 240, 255, 0.35) !important;
+[data-testid="stDialog"] [data-testid="column"]:nth-child(2):not(:last-child) button {
+    border-color: rgba(0, 240, 255, 0.4) !important;
     color: #00F0FF !important;
 }
 
-[data-testid="stDialog"] [data-testid="column"] button,
-.stDialog [data-testid="column"] button {
-    font-size: 0.72rem !important;
-    padding: 4px 8px !important;
-    min-height: 30px !important;
-    height: 30px !important;
-    margin-bottom: 10px !important;
+[data-testid="stDialog"] [data-testid="column"]:nth-child(2):not(:last-child) button:hover {
+    background-color: rgba(0, 240, 255, 0.08) !important;
+    border-color: #00F0FF !important;
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.25) !important;
+}
+
+[data-testid="stDialog"] [data-testid="column"]:last-child button {
+    border-color: rgba(217, 38, 169, 0.45) !important;
+    color: #D926A9 !important;
+    min-width: 36px !important;
+}
+
+[data-testid="stDialog"] [data-testid="column"]:last-child button:hover {
+    background-color: rgba(217, 38, 169, 0.12) !important;
+    border-color: #D926A9 !important;
+    box-shadow: 0 0 8px rgba(217, 38, 169, 0.25) !important;
+    color: #FF6EC7 !important;
 }
 
 /* Diyalog özeti */
 .dialog-summary {
     color: #948AA3;
-    font-size: 0.85rem;
-    margin: 0 0 12px 0;
-    padding-bottom: 12px;
+    font-size: 0.78rem;
+    margin: 0 0 8px 0;
+    padding-bottom: 8px;
     border-bottom: 1px solid rgba(147, 40, 205, 0.2);
 }
 
-/* Kaynak Kütüphanesi açma butonu — sidebar geniş buton */
+/* Kaynak Kütüphanesi açma butonu — sidebar */
 [data-testid="stSidebar"] [data-testid="stButton"] button {
-    font-size: 0.85rem !important;
+    font-size: 0.78rem !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 4px 10px !important;
 }
 
-/* Durum Göstergesi — Sidebar Alt Sabit */
+/* Durum Göstergesi — Sidebar alt, sıfır alt boşluk */
 [data-testid="stSidebar"] .status-indicator {
     width: 100%;
     justify-content: center;
     box-sizing: border-box;
-    margin-top: 8px;
+    margin: 0 !important;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    gap: 8px;
+}
+
+[data-testid="stSidebar"] .status-dot {
+    width: 7px;
+    height: 7px;
+}
+
+[data-testid="stSidebar"] .divider-compact {
+    margin: 4px 0 3px 0 !important;
+}
+
+[data-testid="stSidebar"] .status-indicator-bottom {
+    margin-bottom: 0 !important;
 }
 
 /* Dosya Yükleyici — Geliştirilmiş Görünüm */
 [data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] {
-    border-radius: 10px !important;
+    border-radius: 8px !important;
+    min-height: 46px !important;
+    padding: 6px !important;
     transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 

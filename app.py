@@ -33,7 +33,7 @@ if "silme_onay" not in st.session_state:
 if st.session_state.son_yuklenen:
     ad, parca = st.session_state.son_yuklenen
     if parca > 0:
-        st.toast(f"✅ {ad} — {parca} parça indekslendi", icon="📚")
+        st.toast(f"✅ {ad} — {parca} bölüm hafızaya eklendi", icon="📚")
     else:
         st.toast(f"⚠️ {ad} kaydedildi ancak metin çıkarılamadı", icon="⚠️")
     st.session_state.son_yuklenen = None
@@ -64,13 +64,13 @@ with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
 
 # --- KAYNAK KÜTÜPHANESİ DİYALOGU ---
-@st.dialog("📂 Kaynak Kütüphanesi", width="large")
+@st.dialog("📂 Kaynak Kütüphanesi", width="small")
 def kaynak_kutuphanesi_goster():
     kaynaklar, toplam_parca = get_library_stats()
-    indexed_count = sum(1 for k in kaynaklar if k["indexed"])
+    hafizada_count = sum(1 for k in kaynaklar if k["indexed"])
 
     st.markdown(
-        f'<p class="dialog-summary">{len(kaynaklar)} kaynak · {toplam_parca} parça · {indexed_count} indeksli</p>',
+        f'<p class="dialog-summary">{len(kaynaklar)} kaynak · {toplam_parca} bölüm · {hafizada_count} hafızada</p>',
         unsafe_allow_html=True,
     )
 
@@ -86,31 +86,36 @@ def kaynak_kutuphanesi_goster():
 
     for i, kaynak in enumerate(kaynaklar):
         durum_class = "indexed" if kaynak["indexed"] else "pending"
-        durum_text = f'{kaynak["chunks"]} parça' if kaynak["indexed"] else "İndeks bekliyor"
+        durum_text = f'{kaynak["chunks"]} bölüm okundu' if kaynak["indexed"] else "Henüz okunmadı"
 
-        st.markdown(f"""
-            <div class="source-row {durum_class}">
-                <div class="source-icon">{kaynak["icon"]}</div>
-                <div class="source-details">
-                    <span class="source-name" title="{kaynak["name"]}">{kaynak["name"]}</span>
-                    <span class="source-meta">{kaynak["ext"]} · {kaynak["size"]} · {durum_text}</span>
+        if kaynak["indexed"]:
+            info_col, del_col = st.columns([5.5, 1.3])
+            action_cols = (info_col, None, del_col)
+        else:
+            info_col, teach_col, del_col = st.columns([4, 2.2, 1.3])
+            action_cols = (info_col, teach_col, del_col)
+
+        with action_cols[0]:
+            st.markdown(f"""
+                <div class="source-row source-row-inline {durum_class}">
+                    <div class="source-icon">{kaynak["icon"]}</div>
+                    <div class="source-details">
+                        <span class="source-name" title="{kaynak["name"]}">{kaynak["name"]}</span>
+                        <span class="source-meta">{kaynak["ext"]} · {kaynak["size"]} · {durum_text}</span>
+                    </div>
                 </div>
-            </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
-        if not kaynak["indexed"]:
-            btn_col, idx_col = st.columns([1, 1])
-            with btn_col:
-                if st.button("İndeksle", key=f"dlg_idx_{i}", use_container_width=True):
-                    with st.spinner("İndeksleniyor..."):
+        if action_cols[1] is not None:
+            with action_cols[1]:
+                if st.button("Hafızaya Ekle", key=f"dlg_teach_{i}", use_container_width=True):
+                    with st.spinner("Hafızaya ekleniyor..."):
                         path = os.path.join(".", kaynak["name"])
                         parca = ingest_file(path, retriever.embedder, kaynak["name"])
                     st.session_state.son_yuklenen = (kaynak["name"], parca)
                     st.rerun()
-            with idx_col:
-                if st.button("Sil", key=f"dlg_del_{i}", use_container_width=True):
-                    silme_onay_goster(kaynak["name"])
-        else:
+
+        with action_cols[2]:
             if st.button("Sil", key=f"dlg_del_{i}", use_container_width=True):
                 silme_onay_goster(kaynak["name"])
 
@@ -149,27 +154,27 @@ with st.sidebar:
 
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
 
-    # Metrik kartları
     st.markdown(f"""
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <span class="metric-value">{len(kaynaklar)}</span>
-                <span class="metric-label">Kaynak</span>
+        <div class="micro-dashboard">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-value">{len(kaynaklar)}</span>
+                    <span class="metric-label">Kaynak</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value">{toplam_parca}</span>
+                    <span class="metric-label">Bölüm</span>
+                </div>
             </div>
-            <div class="metric-card">
-                <span class="metric-value">{toplam_parca}</span>
-                <span class="metric-label">Parça</span>
+            <div class="system-info-row">
+                <span class="info-tag"><span class="tag-dot model"></span>Phi-3.5-mini</span>
+                <span class="info-tag"><span class="tag-dot db"></span>Yerel Hafıza</span>
             </div>
-        </div>
-        <div class="system-info-row">
-            <span class="info-tag"><span class="tag-dot model"></span>Phi-3.5-mini</span>
-            <span class="info-tag"><span class="tag-dot db"></span>SQLite Vektör</span>
         </div>
     """, unsafe_allow_html=True)
 
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
 
-    # Dosya yükleme
     st.markdown('<p class="sidebar-section-title">Belge Yükle</p>', unsafe_allow_html=True)
     st.markdown('<p class="sidebar-section-hint">PDF · TXT · MD · DOCX</p>', unsafe_allow_html=True)
 
@@ -185,7 +190,7 @@ with st.sidebar:
         with open(save_path, "wb") as f:
             f.write(yuklenen_dosya.getbuffer())
 
-        with st.spinner("İndeksleniyor..."):
+        with st.spinner("Hafızaya ekleniyor..."):
             parca_sayisi = ingest_file(save_path, retriever.embedder, yuklenen_dosya.name)
 
         st.session_state.son_yuklenen = (yuklenen_dosya.name, parca_sayisi)
@@ -208,14 +213,14 @@ with st.sidebar:
         bekleyen = sum(1 for k in kaynaklar if not k["indexed"])
         if bekleyen > 0:
             st.markdown(
-                f'<p class="sidebar-section-hint">{bekleyen} dosya indeks bekliyor</p>',
+                f'<p class="sidebar-section-hint">{bekleyen} dosya henüz okunmadı</p>',
                 unsafe_allow_html=True,
             )
 
-    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="techlas-divider divider-compact"></div>', unsafe_allow_html=True)
 
     st.markdown("""
-        <div class="status-indicator">
+        <div class="status-indicator status-indicator-bottom">
             <div class="status-dot"></div>
             Motor Çevrimiçi · Kapalı Devre
         </div>
