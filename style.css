@@ -174,48 +174,70 @@ section[data-testid="stSidebar"] {
     padding: 0 !important;
 }
 
+/* Sidebar — dengeli padding, profesyonel dikey ritim */
 section[data-testid="stSidebar"] > div {
     height: 100% !important;
     max-height: 100vh !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding-top: 0.35rem !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.25rem !important;
-    padding-bottom: 0.35rem !important;
+    padding: 0.85rem 0.75rem 0.75rem 0.85rem !important;
     box-sizing: border-box !important;
     scrollbar-width: thin;
     scrollbar-color: #9328cd transparent;
 }
 
-/* İç katmanlar — Streamlit varsayılan boşluklarını sıfırla */
+/* İç katman — esnek düzen, durum göstergesi alta */
 [data-testid="stSidebarContent"],
 div[data-testid="stSidebarUserContent"] {
     overflow: visible !important;
     overflow-x: hidden !important;
     height: auto !important;
+    min-height: calc(100vh - 1.6rem) !important;
     max-height: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 0 !important;
 }
 
-/* Sidebar içi blok aralıkları */
+/* Streamlit blokları — hafif nefes payı + dikey dağılım */
+[data-testid="stSidebar"] div[data-testid="stSidebarUserContent"] > div {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: calc(100vh - 1.6rem) !important;
+}
+
 [data-testid="stSidebar"] [data-testid="stVerticalBlock"],
 [data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] {
-    gap: 0 !important;
+    gap: 0.35rem !important;
     padding: 0 !important;
     margin: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: calc(100vh - 1.6rem) !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div,
-[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] > div {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+/* Esnek boşluk — durum göstergesini alta iter */
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-flex-spacer) {
+    flex: 1 1 auto !important;
+    min-height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-flex-spacer) p,
+[data-testid="stSidebar"] .sidebar-flex-spacer {
+    height: 100% !important;
+    min-height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.status-indicator-bottom) {
+    margin-top: auto !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stElementContainer"] {
@@ -229,17 +251,14 @@ div[data-testid="stSidebarUserContent"] {
     padding: 0 !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stFileUploader"],
-[data-testid="stSidebar"] [data-testid="stButton"] {
-    margin: 0 !important;
+[data-testid="stSidebar"] [data-testid="stFileUploader"] {
+    margin: 0.25rem 0 0 0 !important;
     padding: 0 !important;
 }
 
-/* Son bileşen alt boşluğu yok */
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div:last-child,
-[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"] > div:last-child {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+[data-testid="stSidebar"] [data-testid="stButton"] {
+    margin: 0.15rem 0 0 0 !important;
+    padding: 0 !important;
 }
 
 /* Dış scrollbar — sidebar'ın en sağ kenarı, tam yükseklik */
@@ -272,7 +291,19 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 [data-testid="stSidebar"] .techlas-divider {
-    margin: 5px 0 !important;
+    margin: 11px 0 !important;
+}
+
+[data-testid="stSidebar"] .divider-bottom {
+    margin: 0 0 10px 0 !important;
+}
+
+/* Esnek boşluk — içerik üstte, durum göstergesi altta */
+.sidebar-flex-spacer {
+    flex: 1 1 auto;
+    min-height: 20px;
+    width: 100%;
+    display: block;
 }
 
 /* Sidebar İçi Başlıkların Varsayılan Boşluklarını Ezme */
@@ -348,8 +379,8 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 .sidebar-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 0 2px 0;
+    gap: 10px;
+    padding: 2px 0 4px 0;
 }
 
 .brand-icon {
@@ -387,23 +418,23 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     letter-spacing: 0.2px;
 }
 
-/* Micro-Dashboard — tek kompakt kart */
+/* Micro-Dashboard */
 .micro-dashboard {
     background: rgba(14, 7, 29, 0.55);
     border: 1px solid rgba(147, 40, 205, 0.22);
-    border-radius: 8px;
-    padding: 8px;
+    border-radius: 10px;
+    padding: 11px 12px;
     backdrop-filter: blur(4px);
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.35);
 }
 
 .micro-dashboard .metrics-grid {
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .micro-dashboard .system-info-row {
-    gap: 4px;
+    gap: 6px;
     margin-bottom: 0;
     justify-content: center;
 }
@@ -419,8 +450,8 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 .metric-card {
     background: rgba(10, 4, 20, 0.6);
     border: 1px solid rgba(147, 40, 205, 0.2);
-    border-radius: 7px;
-    padding: 7px 6px;
+    border-radius: 8px;
+    padding: 10px 8px;
     text-align: center;
     transition: border-color 0.3s ease;
 }
@@ -431,16 +462,16 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 
 .metric-value {
     display: block;
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: #00F0FF;
-    line-height: 1;
-    margin-bottom: 2px;
+    line-height: 1.1;
+    margin-bottom: 4px;
 }
 
 .metric-label {
     display: block;
-    font-size: 0.62rem;
+    font-size: 0.64rem;
     color: #948AA3;
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -451,7 +482,7 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 .system-info-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
     margin-bottom: 0;
 }
 
@@ -459,12 +490,12 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 0.65rem;
+    font-size: 0.67rem;
     color: #B8AED0;
     background: rgba(10, 4, 20, 0.5);
     border: 1px solid rgba(39, 20, 71, 0.7);
     border-radius: 20px;
-    padding: 2px 8px;
+    padding: 3px 9px;
 }
 
 .tag-dot {
@@ -484,22 +515,33 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     box-shadow: 0 0 6px #00F0FF;
 }
 
-/* Bölüm Başlıkları */
+/* Bölüm başlık grubu */
+.sidebar-section-header {
+    margin: 2px 0 8px 0;
+}
+
 .sidebar-section-title {
-    font-size: 0.75rem !important;
+    font-size: 0.76rem !important;
     font-weight: 700 !important;
     color: #D3CEE6 !important;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin: 0 0 2px 0 !important;
+    margin: 0 0 5px 0 !important;
     padding: 0 !important;
+    line-height: 1.3;
 }
 
 .sidebar-section-hint {
-    font-size: 0.68rem;
+    font-size: 0.69rem;
     color: #6B6080;
-    margin: 0 0 4px 0;
+    margin: 0;
     letter-spacing: 0.3px;
+    line-height: 1.4;
+}
+
+.sidebar-hint-after-btn {
+    margin-top: 8px !important;
+    text-align: center;
 }
 
 .section-count {
@@ -671,20 +713,25 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 /* Kaynak Kütüphanesi açma butonu — sidebar */
 [data-testid="stSidebar"] [data-testid="stButton"] button {
     font-size: 0.78rem !important;
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 4px 10px !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 6px 12px !important;
 }
 
-/* Durum Göstergesi — Sidebar alt, sıfır alt boşluk */
+/* Durum Göstergesi — sidebar alt */
 [data-testid="stSidebar"] .status-indicator {
     width: 100%;
     justify-content: center;
     box-sizing: border-box;
     margin: 0 !important;
-    padding: 5px 10px;
+    padding: 7px 12px;
     font-size: 0.72rem;
     gap: 8px;
+}
+
+[data-testid="stSidebar"] .status-indicator-bottom {
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
 }
 
 [data-testid="stSidebar"] .status-dot {
@@ -692,20 +739,18 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     height: 7px;
 }
 
-[data-testid="stSidebar"] .divider-compact {
-    margin: 4px 0 3px 0 !important;
-}
-
-[data-testid="stSidebar"] .status-indicator-bottom {
-    margin-bottom: 0 !important;
-}
-
 /* Dosya Yükleyici — Geliştirilmiş Görünüm */
 [data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] {
-    border-radius: 8px !important;
-    min-height: 46px !important;
-    padding: 6px !important;
+    border-radius: 9px !important;
+    min-height: 54px !important;
+    padding: 10px 12px !important;
     transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Uploader alt metnini sidebar'da gizle (Streamlit varsayılan) */
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] small,
+[data-testid="stSidebar"] [data-testid="stFileUploader"] small {
+    display: none !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stFileUploadDropzone"]:hover {

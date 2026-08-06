@@ -175,8 +175,12 @@ with st.sidebar:
 
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
 
-    st.markdown('<p class="sidebar-section-title">Belge Yükle</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sidebar-section-hint">PDF · TXT · MD · DOCX</p>', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="sidebar-section-header">
+            <p class="sidebar-section-title">Belge Yükle</p>
+            <p class="sidebar-section-hint">PDF · TXT · MD · DOCX</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     yuklenen_dosya = st.file_uploader(
         "Dosya seçin veya sürükleyin",
@@ -199,8 +203,7 @@ with st.sidebar:
 
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
 
-    # Kaynak kütüphanesi — açılır panel
-    st.markdown('<p class="sidebar-section-title">Veri Yönetimi</p>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-section-header"><p class="sidebar-section-title">Veri Yönetimi</p></div>', unsafe_allow_html=True)
 
     if st.button(
         f"📂 Kaynak Kütüphanesi ({len(kaynaklar)})",
@@ -213,11 +216,13 @@ with st.sidebar:
         bekleyen = sum(1 for k in kaynaklar if not k["indexed"])
         if bekleyen > 0:
             st.markdown(
-                f'<p class="sidebar-section-hint">{bekleyen} dosya henüz okunmadı</p>',
+                f'<p class="sidebar-section-hint sidebar-hint-after-btn">{bekleyen} dosya henüz okunmadı</p>',
                 unsafe_allow_html=True,
             )
 
-    st.markdown('<div class="techlas-divider divider-compact"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-flex-spacer"></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="techlas-divider divider-bottom"></div>', unsafe_allow_html=True)
 
     st.markdown("""
         <div class="status-indicator status-indicator-bottom">
