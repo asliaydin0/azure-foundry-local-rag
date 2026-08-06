@@ -1,30 +1,31 @@
-/* style.css - TechLas Orijinal Synthwave Tasarımı */
+/* =========================================================
+   style.css - TechLas Orijinal Synthwave (Cyberpunk) Tasarımı 
+   ========================================================= */
 
-/* 1. Ana Arka Plan: Derin Mor/Siyah ve Cyberpunk Izgara (Grid) Deseni */
+/* 1. ANA ARKA PLAN: Derin Mor/Siyah ve Cyberpunk Izgara (Grid) Deseni */
 .stApp {
     background-color: #05020B; /* Logodaki derin karanlık mor */
     background-image: 
         linear-gradient(rgba(0, 240, 255, 0.07) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 240, 255, 0.07) 1px, transparent 1px),
-        radial-gradient(circle at top center, rgba(217, 38, 169, 0.15) 0%, transparent 60%);
+        radial-gradient(circle at top center, rgba(147, 40, 205, 0.15) 0%, transparent 60%);
     background-size: 40px 40px, 40px 40px, 100% 100%;
     background-attachment: fixed;
     color: #E2E8F0;
     font-family: 'Inter', sans-serif;
 }
 
-/* 2. Yan Panel (Sidebar): Koyu Mor ve Pembe Glow */
+/* 2. YAN PANEL (SIDEBAR): Koyu Mor ve Pembe Glow */
 [data-testid="stSidebar"] {
     background-color: rgba(7, 3, 17, 0.95) !important;
     backdrop-filter: blur(10px);
-    border-right: 1px solid rgba(217, 38, 169, 0.3);
+    border-right: 1px solid rgba(147, 40, 205, 0.3);
+    overflow: hidden !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
 }
 
-[data-testid="stSidebar"] > div:first-child {
-    overflow-y: hidden !important;
-}
-
-/* 3. TechLas Logo Başlığı: Birebir Görseldeki Mor -> Cyan Geçişi */
+/* 3. TECHLAS LOGO BAŞLIĞI: Görseldeki Mor -> Cyan Geçişi */
 .techlas-title {
     background: linear-gradient(90deg, #9328cd 0%, #00F0FF 100%);
     -webkit-background-clip: text;
@@ -32,7 +33,7 @@
     font-size: 3.8rem;
     font-weight: 900;
     margin-bottom: 0;
-    text-shadow: 0px 0px 25px rgba(217, 38, 169, 0.3); /* Logodaki halka ışıltısı */
+    text-shadow: 0px 0px 25px rgba(147, 40, 205, 0.3); /* Logodaki halka ışıltısı */
     letter-spacing: -1px;
 }
 
@@ -42,31 +43,39 @@
     margin-bottom: 2rem;
 }
 
-/* 4. Kaynaklar İçin Özel Scrollbar (Mor - Cyan Akışı) */
-.scrollable-sources {
-    max-height: 40vh;
-    overflow-y: auto;
+/* 4. AÇILIR EKRAN (MODAL) İÇİ KAYNAK LİSTESİ SCROLLBAR'I */
+.scrollable-sources,
+[data-testid="stDialog"] > div > div,
+[data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"] {
+    max-height: 60vh !important;
+    overflow-y: auto !important;
     padding-right: 8px;
     margin-bottom: 10px;
 }
 
-.scrollable-sources::-webkit-scrollbar {
+.scrollable-sources::-webkit-scrollbar,
+[data-testid="stDialog"] > div > div::-webkit-scrollbar,
+[data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar {
     width: 6px;
 }
-.scrollable-sources::-webkit-scrollbar-track {
+.scrollable-sources::-webkit-scrollbar-track,
+[data-testid="stDialog"] > div > div::-webkit-scrollbar-track,
+[data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar-track {
     background: #0A0414;
     border-radius: 10px;
 }
-.scrollable-sources::-webkit-scrollbar-thumb {
+.scrollable-sources::-webkit-scrollbar-thumb,
+[data-testid="stDialog"] > div > div::-webkit-scrollbar-thumb,
+[data-testid="stDialog"] [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #9328cd, #00F0FF);
     border-radius: 10px;
 }
 
-/* 5. Dosya Kartları: Görseldeki Renklerle Etkileşim */
+/* 5. DOSYA KARTLARI: Etkileşimli Neon Renkler */
 .file-card {
     background-color: rgba(14, 7, 29, 0.8);
     border: 1px solid #231245;
-    border-left: 3px solid #9328cd; /* Görseldeki mor vurgu */
+    border-left: 3px solid #9328cd; /* Orijinal mor vurgu */
     border-radius: 8px;
     padding: 12px 15px;
     margin-bottom: 12px;
@@ -77,14 +86,14 @@
 
 .file-card:hover {
     border-color: #00F0FF;
-    border-left: 4px solid #00F0FF; /* Üzerine gelince görseldeki cyan rengine döner */
+    border-left: 4px solid #00F0FF; /* Hover'da cyan'a döner */
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
     color: #FFFFFF;
     transform: translateX(4px);
     background-color: rgba(21, 10, 43, 0.9);
 }
 
-/* 6. Mesaj Balonları ve Girdi Kutusu */
+/* 6. MESAJ BALONLARI VE CHAT INPUT KUTUSU */
 [data-testid="stChatMessage"] {
     background-color: rgba(12, 6, 23, 0.7);
     backdrop-filter: blur(5px);
@@ -106,7 +115,7 @@
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
-/* 7. Canlı Status: Görseldeki Neon Camgöbeği (Cyan) */
+/* 7. CANLI DURUM GÖSTERGESİ (MOTOR ÇEVRİMİÇİ) */
 .status-indicator {
     display: inline-flex;
     align-items: center;
@@ -135,94 +144,95 @@
     100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
 }
 
-/* --- STREAMLIT VARSAYILAN BLOKLARINI ŞEFFAF YAPMA --- */
+/* =========================================================
+   STREAMLIT VARSAYILAN KODLARINI EZME VE YERLEŞİM (UI/UX)
+   ========================================================= */
 
-/* Üst menü (Header) arka planını şeffaf yap */
-[data-testid="stHeader"] {
-    background-color: transparent !important;
-}
-
-/* Alt mesaj kutusunun (Chat Input) etrafındaki katı şeridi şeffaf yap */
-[data-testid="stBottom"] {
-    background-color: transparent !important;
-}
-
+/* Üst ve Alt Bloklardaki Katı Siyah Arka Planları Şeffaf Yap */
+[data-testid="stHeader"], 
+[data-testid="stBottom"], 
 [data-testid="stBottom"] > div {
     background-color: transparent !important;
 }
 
-/* --- BAŞLIK VE ÇİZGİ BOŞLUKLARINI AYARLAMA --- */
-
-/* Sidebar içindeki başlıkların (Sistem Paneli, vb.) boşluklarını iyice daralt */
-[data-testid="stSidebar"] h3, 
-[data-testid="stSidebar"] h4 {
-    margin-top: 0px !important;
-    margin-bottom: 0px !important; 
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
+/* Sidebar — scroll dış katmanda, sağ kenarda tam boy */
+section[data-testid="stSidebar"] > div {
+    height: 100% !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-top: 2.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 0.35rem !important;
+    padding-bottom: 1.5rem !important;
+    box-sizing: border-box !important;
+    scrollbar-width: thin;
+    scrollbar-color: #9328cd transparent;
 }
 
-/* Kendi özel, ince neon ayraç çizgimiz ve etrafındaki boşluklar */
+/* İç katmanlar kendi scrollbar'ını taşımasın */
+[data-testid="stSidebarContent"],
+div[data-testid="stSidebarUserContent"] {
+    overflow: visible !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    max-height: none !important;
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0px !important;
+}
+
+/* Dış scrollbar — sidebar'ın en sağ kenarı, tam yükseklik */
+section[data-testid="stSidebar"] > div::-webkit-scrollbar {
+    width: 5px !important;
+}
+section[data-testid="stSidebar"] > div::-webkit-scrollbar-track {
+    background: transparent !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+section[data-testid="stSidebar"] > div::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #9328cd, #00F0FF) !important;
+    border-radius: 10px !important;
+    min-height: 40px;
+}
+
+/* İç scrollbar gizli */
+[data-testid="stSidebarContent"]::-webkit-scrollbar,
+div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* Özel İnce Neon Ayraç Çizgisi */
 .techlas-divider {
     height: 1px;
     background: linear-gradient(90deg, rgba(147, 40, 205, 0.5) 0%, rgba(0, 240, 255, 0.5) 100%);
-    margin: 5px 0px !important; 
+    margin: 15px 0px !important; 
 }
 
-/* Sidebar içindeki varsayılan st.divider() çizgilerinin boşluklarını daralt */
-[data-testid="stSidebar"] hr {
-    margin-top: 8px !important;
-    margin-bottom: 10px !important;
-}
-/* --- AÇILIR EKRAN (MODAL) BUTONU İÇİN SYNTHWAVE STİLİ --- */
-[data-testid="stButton"] button {
-    background-color: transparent !important;
-    border: 1px solid #D926A9 !important; /* Neon Mor çerçeve */
-    color: #00F0FF !important; /* Neon Cyan metin */
-    border-radius: 8px !important;
-    transition: all 0.3s ease !important;
+/* Sidebar İçi Başlıkların Varsayılan Boşluklarını Ezme */
+[data-testid="stSidebar"] h3, 
+[data-testid="stSidebar"] h4 {
+    margin-top: 0px !important;
+    margin-bottom: 5px !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    color: #D3CEE6 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.5px;
 }
 
-[data-testid="stButton"] button:hover {
-    background-color: rgba(217, 38, 169, 0.15) !important;
-    border-color: #00F0FF !important;
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4) !important; /* Üzerine gelince parlama */
-}
-/* --- PROFESYONEL SIDEBAR YERLEŞİMİ --- */
+/* =========================================================
+   YENİ EKLENEN PROFESYONEL BİLEŞENLER (DASHBOARD & UPLOADER)
+   ========================================================= */
 
-/* 1. Sidebar Ana Kaydırma Çubuğunu Aç ve Özelleştir */
-section[data-testid="stSidebar"] > div {
-    overflow-y: auto !important; /* Gizlemeyi iptal ettik, dikey kaydırmayı açtık */
-    overflow-x: hidden !important;
-    padding-top: 2.5rem !important; 
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-}
-
-/* Sidebar Scrollbar Tasarımı (İnce Synthwave Çizgisi) */
-section[data-testid="stSidebar"] > div::-webkit-scrollbar {
-    width: 4px; /* Çok ince ve zarif bir bar */
-}
-section[data-testid="stSidebar"] > div::-webkit-scrollbar-track {
-    background: transparent; /* Arka planı şeffaf yapıp kalabalığı önlüyoruz */
-}
-section[data-testid="stSidebar"] > div::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #D926A9, #00F0FF); /* Mor-Cyan gradyan */
-    border-radius: 10px;
-}
-
-/* Dosya yüklendiğinde uploader'ın aldığı gri arka planı transparan ve şık yap */
-[data-testid="stUploadedFile"] {
-    background-color: rgba(14, 7, 29, 0.6) !important;
-    border: 1px solid rgba(0, 240, 255, 0.3) !important;
-    border-radius: 8px !important;
-    color: #E2E8F0 !important;
-}
-
-/* Yeni Sistem Bilgi Kartı Tasarımı (Micro-Dashboard) */
+/* Sistem Bilgi Kartı (Micro-Dashboard) Tasarımı */
 .info-card {
     background: rgba(14, 7, 29, 0.4);
-    border: 1px solid rgba(217, 38, 169, 0.2);
+    border: 1px solid rgba(147, 40, 205, 0.2);
     border-radius: 8px;
     padding: 12px;
     font-size: 0.85rem;
@@ -232,15 +242,352 @@ section[data-testid="stSidebar"] > div::-webkit-scrollbar-thumb {
     margin-bottom: 10px;
 }
 
-/* Çizgi boşluklarını ferahlat */
-.techlas-divider {
-    margin: 15px 0px !important; 
+/* Aktif Kaynakları İncele Butonu (Neon Hover Efekti) */
+[data-testid="stButton"] button {
+    background-color: transparent !important;
+    border: 1px solid #9328cd !important;
+    color: #00F0FF !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
 }
 
-/* Başlık altı boşluklarını ferahlat */
-[data-testid="stSidebar"] h4 {
-    margin-bottom: 10px !important;
+[data-testid="stButton"] button:hover {
+    background-color: rgba(147, 40, 205, 0.15) !important;
+    border-color: #00F0FF !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4) !important; 
+}
+
+/* Dosya Yükleyici (Uploader) Sıkıştırma */
+[data-testid="stFileUploadDropzone"] {
+    padding: 10px !important;
+    min-height: 60px !important;
+    background-color: rgba(14, 7, 29, 0.5) !important;
+    border: 1px dashed rgba(147, 40, 205, 0.5) !important;
+}
+
+/* Uploader İçindeki "200MB per file" İbaresini Gizle */
+[data-testid="stFileUploadDropzone"] small {
+    display: none !important; 
+}
+
+/* Anlık Yüklenen Dosyanın Gri Kutusunu Transparan Yap */
+[data-testid="stUploadedFile"] {
+    background-color: rgba(14, 7, 29, 0.6) !important;
+    border: 1px solid rgba(0, 240, 255, 0.3) !important;
+    border-radius: 8px !important;
+    color: #E2E8F0 !important;
+}
+
+/* =========================================================
+   SIDEBAR — PROFESYONEL KONTROL PANELİ
+   ========================================================= */
+
+/* Marka Başlığı */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0 8px 0;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, rgba(147, 40, 205, 0.25), rgba(0, 240, 255, 0.15));
+    border: 1px solid rgba(147, 40, 205, 0.4);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(147, 40, 205, 0.2);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #D926A9, #00F0FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.brand-sub {
+    font-size: 0.72rem;
+    color: #948AA3;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+}
+
+/* Metrik Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.metric-card {
+    background: rgba(14, 7, 29, 0.6);
+    border: 1px solid rgba(147, 40, 205, 0.25);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.metric-card:hover {
+    border-color: rgba(0, 240, 255, 0.35);
+}
+
+.metric-value {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #00F0FF;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #948AA3;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Sistem Bilgi Etiketleri */
+.system-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.info-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: #B8AED0;
+    background: rgba(14, 7, 29, 0.5);
+    border: 1px solid rgba(39, 20, 71, 0.8);
+    border-radius: 20px;
+    padding: 4px 10px;
+}
+
+.tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.tag-dot.model {
+    background: #9328cd;
+    box-shadow: 0 0 6px #9328cd;
+}
+
+.tag-dot.db {
+    background: #00F0FF;
+    box-shadow: 0 0 6px #00F0FF;
+}
+
+/* Bölüm Başlıkları */
+.sidebar-section-title {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
     color: #D3CEE6 !important;
-    font-size: 0.95rem !important;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
+}
+
+.sidebar-section-hint {
+    font-size: 0.72rem;
+    color: #6B6080;
+    margin: 0 0 10px 0;
     letter-spacing: 0.5px;
+}
+
+.section-count {
+    display: inline-block;
+    background: rgba(147, 40, 205, 0.25);
+    color: #00F0FF;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+/* Boş Kütüphane Durumu */
+.empty-library {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 24px 16px;
+    background: rgba(14, 7, 29, 0.4);
+    border: 1px dashed rgba(147, 40, 205, 0.3);
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.empty-icon {
+    font-size: 1.8rem;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 0.85rem;
+    color: #948AA3;
+    font-weight: 600;
+}
+
+.empty-hint {
+    font-size: 0.72rem;
+    color: #6B6080;
+}
+
+/* Kaynak Satırları */
+.source-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(14, 7, 29, 0.7);
+    border: 1px solid #231245;
+    border-left: 3px solid #9328cd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    transition: all 0.25s ease;
+}
+
+.source-row.indexed {
+    border-left-color: #00F0FF;
+}
+
+.source-row.pending {
+    border-left-color: #D926A9;
+    opacity: 0.85;
+}
+
+.source-row:hover {
+    border-color: rgba(0, 240, 255, 0.4);
+    background: rgba(21, 10, 43, 0.85);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.12);
+}
+
+.source-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.source-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.source-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #E2E8F0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.source-meta {
+    font-size: 0.68rem;
+    color: #948AA3;
+    letter-spacing: 0.2px;
+}
+
+/* Kaynak Aksiyon Butonları — Diyalog içi (İndeksle / Sil) */
+[data-testid="stDialog"] [data-testid="column"]:last-child button,
+.stDialog [data-testid="column"]:last-child button {
+    border-color: rgba(217, 38, 169, 0.5) !important;
+    color: #D926A9 !important;
+}
+
+[data-testid="stDialog"] [data-testid="column"]:last-child button:hover,
+.stDialog [data-testid="column"]:last-child button:hover {
+    background-color: rgba(217, 38, 169, 0.15) !important;
+    border-color: #D926A9 !important;
+    box-shadow: 0 0 10px rgba(217, 38, 169, 0.3) !important;
+    color: #FF6EC7 !important;
+}
+
+[data-testid="stDialog"] [data-testid="column"]:first-child button,
+.stDialog [data-testid="column"]:first-child button {
+    border-color: rgba(0, 240, 255, 0.35) !important;
+    color: #00F0FF !important;
+}
+
+[data-testid="stDialog"] [data-testid="column"] button,
+.stDialog [data-testid="column"] button {
+    font-size: 0.72rem !important;
+    padding: 4px 8px !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    margin-bottom: 10px !important;
+}
+
+/* Diyalog özeti */
+.dialog-summary {
+    color: #948AA3;
+    font-size: 0.85rem;
+    margin: 0 0 12px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(147, 40, 205, 0.2);
+}
+
+/* Kaynak Kütüphanesi açma butonu — sidebar geniş buton */
+[data-testid="stSidebar"] [data-testid="stButton"] button {
+    font-size: 0.85rem !important;
+}
+
+/* Durum Göstergesi — Sidebar Alt Sabit */
+[data-testid="stSidebar"] .status-indicator {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+    margin-top: 8px;
+}
+
+/* Dosya Yükleyici — Geliştirilmiş Görünüm */
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] {
+    border-radius: 10px !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploadDropzone"]:hover {
+    border-color: rgba(0, 240, 255, 0.5) !important;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.15) !important;
+}
+
+/* Silme Diyalogu */
+.dialog-warning {
+    color: #D3CEE6;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 8px 0 16px 0;
 }
