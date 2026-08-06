@@ -1,11 +1,15 @@
+import concurrent.futures
 import streamlit as st
 import os
-from retriever import VectorRetriever
+import html
+from retriever import VectorRetriever, build_context
 from document_manager import (
     delete_document,
     get_library_stats,
     ingest_file,
 )
+
+CHAT_TIMEOUT_SECONDS = 120
 
 # 1. Sayfa Tasarımı ve Temel Ayarlar
 st.set_page_config(page_title="TechLas Workspace", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
@@ -39,12 +43,12 @@ if st.session_state.son_yuklenen:
     st.session_state.son_yuklenen = None
 
 if st.session_state.son_silinen:
-    st.toast(f"🗑️ {st.session_state.son_silinen} kaldırıldı", icon="✅")
+    st.toast(st.session_state.son_silinen, icon="✅")
     st.session_state.son_silinen = None
 
 # 2. AI Sistemi (Sidebar'dan önce — dosya işlemleri embedder gerektirir)
 @st.cache_resource
-def load_ai_system():
+def load_ai_system(_retriever_version: int = 2):
     retriever = VectorRetriever()
     manager = retriever.embedder.manager
 
@@ -60,6 +64,22 @@ def load_ai_system():
 
     return retriever, chat_client
 
+
+def complete_chat_with_timeout(chat_client, messages, timeout: int = CHAT_TIMEOUT_SECONDS):
+    """SDK'da doğrudan timeout olmadığı için tamamlamayı sınırlı sürede çalıştırır."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(chat_client.complete_chat, messages)
+        return future.result(timeout=timeout)
+
+
+def _chat_hata_mesaji(exc: Exception) -> str:
+    mesaj = str(exc).lower()
+    if isinstance(exc, TimeoutError) or "timeout" in mesaj:
+        return "⏱️ Modelin cevap verme süresi aşıldı. Lütfen daha kısa bir soru sorun veya işlemi tekrarlayın."
+    if "cancelled" in mesaj or "canceled" in mesaj:
+        return "⏱️ Modelin cevap verme süresi aşıldı. Lütfen daha kısa bir soru sorun veya işlemi tekrarlayın."
+    return f"❌ Sistem Hatası: {exc}"
+
 with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
 
@@ -74,10 +94,23 @@ def hafizaya_ekle(dosya_adi: str) -> int:
     return ingest_file(path, retriever.embedder, dosya_adi)
 
 
-def kaynaktan_sil(dosya_adi: str) -> None:
-    """Dosyayı diskten ve vektör hafızasından kaldırır."""
-    if not delete_document(dosya_adi):
-        raise FileNotFoundError(f"'{dosya_adi}' silinemedi veya bulunamadı.")
+def kaynaktan_sil(dosya_adi: str) -> dict:
+    """Dosyayı diskten ve vektör hafızasından iki aşamada kaldırır."""
+    result = delete_document(dosya_adi)
+    if not result["success"]:
+        raise FileNotFoundError(f"'{dosya_adi}' sistemde veya hafızada bulunamadı.")
+    return result
+
+
+def _silme_toast_mesaji(result: dict) -> str:
+    ad = result["filename"]
+    if result["file_deleted"] and result["vectors_removed"] > 0:
+        return f"{ad} sistemden ve hafızadan tamamen silindi!"
+    if result["file_deleted"]:
+        return f"{ad} sistemden silindi!"
+    if result["vectors_removed"] > 0:
+        return f"{ad} hafızadan silindi ({result['vectors_removed']} bölüm)!"
+    return f"{ad} kaldırıldı."
 
 
 def _kutuphane_kapatildi() -> None:
@@ -97,10 +130,16 @@ def _silme_onay_ekrani(dosya_adi: str) -> None:
     with onay_col:
         if st.button("Evet, Sil", key="confirm_del_active", use_container_width=True, type="primary"):
             try:
-                kaynaktan_sil(dosya_adi)
+                result = kaynaktan_sil(dosya_adi)
                 st.session_state.silme_bekleyen = None
-                st.toast(f"🗑️ {dosya_adi} kaldırıldı", icon="✅")
+                mesaj = _silme_toast_mesaji(result)
+                st.session_state.son_silinen = mesaj
+                st.toast(mesaj, icon="✅")
+                if result.get("file_warning"):
+                    st.warning(result["file_warning"])
                 st.rerun(scope="fragment")
+            except PermissionError as e:
+                st.error(str(e))
             except Exception as e:
                 st.error(f"Silinemedi: {e}")
     with iptal_col:
@@ -278,25 +317,33 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+USER_AVATAR = "👤"
+ASSISTANT_AVATAR = "⚡"
+
+
+def render_chat_message(role: str, content: str) -> None:
+    avatar = USER_AVATAR if role == "user" else ASSISTANT_AVATAR
+    with st.chat_message(role, avatar=avatar):
+        st.markdown(f'<span class="chat-role-marker chat-role-{role}"></span>', unsafe_allow_html=True)
+        st.markdown(content)
+
 # 5. Sohbet Geçmişi
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+    render_chat_message(msg["role"], msg["content"])
 
 # 6. RAG Sohbet
 if prompt := st.chat_input("Veritabanında aramak istediğiniz konuyu yazın..."):
-    st.chat_message("user").markdown(prompt)
+    render_chat_message("user", prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
+        st.markdown('<span class="chat-role-marker chat-role-assistant"></span>', unsafe_allow_html=True)
         with st.spinner("Veriler analiz ediliyor..."):
             bulunan_dokumanlar = retriever.search(prompt, top_k=2)
-            baglam_metni = "\n\n".join(
-                [f"- Kaynak: {doc['source']}\n  İçerik: {doc['text']}" for doc in bulunan_dokumanlar]
-            )
+            baglam_metni = build_context(bulunan_dokumanlar)
 
             system_prompt = f"""Sen TechLas firmasının resmi ve son derece katı kuralları olan yapay zeka asistanısın.
 
@@ -313,11 +360,13 @@ BAĞLAM:
 """
 
             try:
-                response = chat_client.complete_chat(
+                response = complete_chat_with_timeout(
+                    chat_client,
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt},
-                    ]
+                    ],
+                    timeout=CHAT_TIMEOUT_SECONDS,
                 )
 
                 if hasattr(response, "choices"):
@@ -327,12 +376,18 @@ BAĞLAM:
 
                 st.markdown(cevap)
 
-                with st.expander("Kaynak Detayları"):
+                with st.expander("📎 Kaynak Detayları", expanded=False):
                     for i, doc in enumerate(bulunan_dokumanlar):
-                        st.markdown(f"**Kaynak {i+1}: {doc['source']}**\n\n{doc['text']}")
+                        st.markdown(
+                            f'<div class="source-terminal-block">'
+                            f'<span class="source-terminal-label">Kaynak {i + 1}: {html.escape(doc["source"])}</span>'
+                            f'<pre class="source-terminal-text">{html.escape(doc["text"])}</pre>'
+                            f'</div>',
+                            unsafe_allow_html=True,
+                        )
 
             except Exception as e:
-                cevap = f"❌ Sistem Hatası: {e}"
-                st.error(cevap)
+                cevap = _chat_hata_mesaji(e)
+                st.warning(cevap)
 
             st.session_state.messages.append({"role": "assistant", "content": cevap})

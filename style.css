@@ -98,26 +98,191 @@
     background-color: rgba(21, 10, 43, 0.9);
 }
 
-/* 6. MESAJ BALONLARI VE CHAT INPUT KUTUSU */
-[data-testid="stChatMessage"] {
-    background-color: rgba(12, 6, 23, 0.7);
-    backdrop-filter: blur(5px);
-    border: 1px solid #271447;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0, 0.4);
+/* =========================================================
+   ANA SOHBET EKRANI — SYNTHWAVE CHAT UI
+   ========================================================= */
+
+.chat-role-marker {
+    display: none !important;
 }
 
+/* Avatar alanı — varsayılan Streamlit ikonlarını gizle, emoji göster */
+[data-testid="stChatMessage"] [data-testid="stChatMessageAvatar"],
+[data-testid="stChatMessageAvatar"] {
+    background: rgba(14, 7, 29, 0.85) !important;
+    border: 1px solid rgba(147, 40, 205, 0.35) !important;
+    border-radius: 8px !important;
+    font-size: 1.05rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    min-width: 2rem !important;
+    min-height: 2rem !important;
+    box-shadow: 0 0 10px rgba(147, 40, 205, 0.2);
+}
+
+[data-testid="stChatMessage"]:has(.chat-role-user) [data-testid="stChatMessageAvatar"],
+[data-testid="stChatMessage"]:has(.chat-role-user) [data-testid="stChatMessageAvatar"] {
+    border-color: rgba(217, 38, 169, 0.5) !important;
+    box-shadow: 0 0 10px rgba(217, 38, 169, 0.25);
+}
+
+[data-testid="stChatMessage"]:has(.chat-role-assistant) [data-testid="stChatMessageAvatar"],
+[data-testid="stChatMessage"]:has(.chat-role-assistant) [data-testid="stChatMessageAvatar"] {
+    border-color: rgba(0, 240, 255, 0.5) !important;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+/* Mesaj balonları — glassmorphism taban */
+[data-testid="stChatMessage"] {
+    background-color: rgba(12, 6, 23, 0.55) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(39, 20, 71, 0.8) !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    margin-bottom: 14px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Kullanıcı mesajı — neon pembe vurgu */
+[data-testid="stChatMessage"]:has(.chat-role-user) {
+    border-left: 3px solid #D926A9 !important;
+    border-color: rgba(217, 38, 169, 0.35) !important;
+    background: linear-gradient(135deg, rgba(217, 38, 169, 0.06), rgba(12, 6, 23, 0.6)) !important;
+}
+
+[data-testid="stChatMessage"]:has(.chat-role-user):hover {
+    box-shadow: 0 0 14px rgba(217, 38, 169, 0.15) !important;
+}
+
+/* Asistan mesajı — neon camgöbeği vurgu */
+[data-testid="stChatMessage"]:has(.chat-role-assistant) {
+    border-left: 3px solid #00F0FF !important;
+    border-color: rgba(0, 240, 255, 0.25) !important;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(12, 6, 23, 0.6)) !important;
+}
+
+[data-testid="stChatMessage"]:has(.chat-role-assistant):hover {
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.12) !important;
+}
+
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] li {
+    color: #E2E8F0 !important;
+    line-height: 1.65;
+}
+
+/* Chat Input — synthwave odak halkası */
 [data-testid="stChatInput"] {
-    background-color: rgba(12, 6, 23, 0.9);
-    border: 1px solid #271447;
-    border-radius: 15px;
+    background-color: rgba(10, 4, 20, 0.85) !important;
+    border: 1px solid rgba(147, 40, 205, 0.35) !important;
+    border-radius: 14px !important;
+    backdrop-filter: blur(6px);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+[data-testid="stChatInput"] textarea {
+    background: transparent !important;
+    color: #E2E8F0 !important;
+    caret-color: #00F0FF !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+[data-testid="stChatInput"] textarea:focus,
+[data-testid="stChatInput"] textarea:focus-visible {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 [data-testid="stChatInput"]:focus-within {
-    border: 1px solid #00F0FF;
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    border: 1px solid #00F0FF !important;
+    box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.3),
+                0 0 16px rgba(0, 240, 255, 0.35),
+                0 0 32px rgba(0, 240, 255, 0.1) !important;
+    outline: none !important;
+}
+
+[data-testid="stChatInput"] button {
+    color: #00F0FF !important;
+}
+
+[data-testid="stChatInput"] button:hover {
+    color: #FFFFFF !important;
+    background: rgba(0, 240, 255, 0.12) !important;
+}
+
+/* Kaynak Detayları Expander — terminal/kod kutusu */
+[data-testid="stMainBlockContainer"] [data-testid="stExpander"],
+[data-testid="stAppViewBlockContainer"] [data-testid="stExpander"] {
+    background: rgba(8, 3, 16, 0.9) !important;
+    border: 1px solid rgba(147, 40, 205, 0.35) !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5),
+                0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-testid="stMainBlockContainer"] [data-testid="stExpander"] summary,
+[data-testid="stAppViewBlockContainer"] [data-testid="stExpander"] summary {
+    background: rgba(14, 7, 29, 0.8) !important;
+    color: #00F0FF !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.4px;
+    padding: 10px 14px !important;
+    border-bottom: 1px solid rgba(147, 40, 205, 0.2);
+}
+
+[data-testid="stMainBlockContainer"] [data-testid="stExpander"] summary:hover,
+[data-testid="stAppViewBlockContainer"] [data-testid="stExpander"] summary:hover {
+    color: #FFFFFF !important;
+    background: rgba(21, 10, 43, 0.9) !important;
+}
+
+[data-testid="stMainBlockContainer"] [data-testid="stExpander"] [data-testid="stExpanderDetails"],
+[data-testid="stAppViewBlockContainer"] [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    background: rgba(5, 2, 11, 0.95) !important;
+    padding: 10px 12px !important;
+}
+
+.source-terminal-block {
+    background: rgba(4, 1, 10, 0.95);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    border-left: 2px solid #9328cd;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.source-terminal-block:last-child {
+    margin-bottom: 0;
+}
+
+.source-terminal-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #00F0FF;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.source-terminal-text {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    color: #B8AED0 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.55 !important;
+    white-space: pre-wrap !important;
+    word-break: break-word;
+    font-family: 'Consolas', 'Courier New', monospace;
 }
 
 /* 7. CANLI DURUM GÖSTERGESİ (MOTOR ÇEVRİMİÇİ) */

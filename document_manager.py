@@ -2,7 +2,7 @@ import os
 import sqlite3
 from pathlib import Path
 
-from database import DB_NAME, init_db
+from database import DB_NAME, delete_vectors_by_source, init_db
 
 SUPPORTED_EXTENSIONS = (".pdf", ".txt", ".md", ".docx")
 CHUNK_SIZE = 800
@@ -84,7 +84,7 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVE
 
 
 def get_library_stats() -> tuple[list[dict], int]:
-    init_db()
+    init_db(quiet=True)
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("SELECT source_file, COUNT(*) FROM documents GROUP BY source_file")
@@ -112,7 +112,7 @@ def get_library_stats() -> tuple[list[dict], int]:
 
 
 def ingest_file(filepath: str, embedder, source_name=None) -> int:
-    init_db()
+    init_db(quiet=True)
     source = source_name or os.path.basename(filepath)
     text = extract_text(filepath)
     chunks = chunk_text(text)
@@ -139,20 +139,42 @@ def ingest_file(filepath: str, embedder, source_name=None) -> int:
     return count
 
 
-def delete_document(filename: str) -> bool:
+def delete_document(filename: str) -> dict:
+    """
+    İki aşamalı silme:
+      1) Dosyayı diskten kaldır (yoksa uyarı ile devam)
+      2) Vektör DB'den yalnızca bu kaynağa ait parçaları sil
+    """
     if filename in PROTECTED_FILENAMES:
         raise PermissionError(f"'{filename}' proje dosyasıdır, silinemez.")
 
     ensure_docs_dir()
     filepath = os.path.join(DOCS_DIR, filename)
-    init_db()
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM documents WHERE source_file = ?", (filename,))
-    conn.commit()
-    conn.close()
 
-    if os.path.exists(filepath):
-        os.remove(filepath)
-        return True
-    return False
+    file_deleted = False
+    file_missing = False
+    file_warning = None
+
+    # Adım 1 — Fiziksel dosya silme
+    try:
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            file_deleted = True
+        else:
+            file_missing = True
+            file_warning = f"'{filename}' diskte bulunamadı, vektör temizliği yapılacak."
+    except OSError as exc:
+        file_missing = True
+        file_warning = f"'{filename}' diskten silinemedi: {exc}"
+
+    # Adım 2 — Yalnızca ilgili kaynağın vektörlerini sil
+    vectors_removed = delete_vectors_by_source(filename)
+
+    return {
+        "filename": filename,
+        "file_deleted": file_deleted,
+        "file_missing": file_missing,
+        "file_warning": file_warning,
+        "vectors_removed": vectors_removed,
+        "success": file_deleted or file_missing or vectors_removed > 0,
+    }

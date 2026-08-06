@@ -3,6 +3,18 @@ import numpy as np
 from embedding import LocalEmbedder
 from database import DB_NAME
 
+MAX_CHUNK_CHARS = 500
+MAX_CONTEXT_CHARS = 1800
+
+
+def truncate_text(text: str, max_chars: int) -> str:
+    """Metni token limitini aşmamak için güvenli şekilde kısaltır."""
+    text = (text or "").strip()
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
+
+
 def cosine_similarity(v1, v2):
     """İki vektör (sayı dizisi) arasındaki benzerlik oranını hesaplar (0 ile 1 arası)."""
     dot_product = np.dot(v1, v2)
@@ -14,6 +26,28 @@ def cosine_similarity(v1, v2):
         return 0.0
         
     return dot_product / (norm_v1 * norm_v2)
+
+def build_context(documents: list) -> str:
+    """Arama sonuçlarını model bağlam limitine uygun tek metne dönüştürür."""
+    parts: list[str] = []
+    total_len = 0
+
+    for doc in documents:
+        snippet = truncate_text(doc.get("text", ""), MAX_CHUNK_CHARS)
+        block = f"- Kaynak: {doc['source']}\n  İçerik: {snippet}"
+        block_len = len(block)
+
+        if total_len + block_len > MAX_CONTEXT_CHARS:
+            remaining = MAX_CONTEXT_CHARS - total_len
+            if remaining > 80:
+                parts.append(truncate_text(block, remaining))
+            break
+
+        parts.append(block)
+        total_len += block_len + 2
+
+    return "\n\n".join(parts)
+
 
 class VectorRetriever:
     def __init__(self):
@@ -62,8 +96,13 @@ class VectorRetriever:
         # 4. Sonuçları en yüksek skordan en düşüğe doğru sırala
         results.sort(key=lambda x: x["score"], reverse=True)
         
-        # Sadece en iyi (top_k) sonuçları döndür
-        return results[:top_k]
+        top_results = results[:top_k]
+        for item in top_results:
+            item["text"] = truncate_text(item["text"], MAX_CHUNK_CHARS)
+        return top_results
+
+    def build_context(self, documents: list) -> str:
+        return build_context(documents)
 
 # Test aşaması
 if __name__ == "__main__":
