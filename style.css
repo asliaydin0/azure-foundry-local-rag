@@ -285,35 +285,6 @@
     font-family: 'Consolas', 'Courier New', monospace;
 }
 
-/* 7. CANLI DURUM GÖSTERGESİ (MOTOR ÇEVRİMİÇİ) */
-.status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    background: rgba(0, 240, 255, 0.05);
-    border: 1px solid rgba(0, 240, 255, 0.2);
-    border-radius: 20px;
-    color: #00F0FF;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #00F0FF;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #00F0FF;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.5); }
-    70% { box-shadow: 0 0 0 8px rgba(0, 240, 255, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
-}
-
 /* =========================================================
    STREAMLIT VARSAYILAN KODLARINI EZME VE YERLEŞİM (UI/UX)
    ========================================================= */
@@ -339,20 +310,20 @@ section[data-testid="stSidebar"] {
     padding: 0 !important;
 }
 
-/* Sidebar — tek dış scroll yok; footer sabit, içerik kayar */
+/* Sidebar — kompakt dikey yerleşim */
 section[data-testid="stSidebar"] > div {
     height: 100vh !important;
     max-height: 100vh !important;
     overflow: hidden !important;
     overflow-x: hidden !important;
-    padding: 0.85rem 0.75rem 0 0.85rem !important;
+    padding: 0.85rem 0.75rem 0.85rem 0.85rem !important;
     box-sizing: border-box !important;
     position: relative !important;
     display: flex !important;
     flex-direction: column !important;
 }
 
-/* Ana sidebar içeriği — footer hariç kaydırılabilir alan */
+/* Ana sidebar içeriği */
 [data-testid="stSidebarContent"],
 div[data-testid="stSidebarUserContent"] {
     overflow-x: hidden !important;
@@ -360,7 +331,7 @@ div[data-testid="stSidebarUserContent"] {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     max-height: 100% !important;
-    padding: 0 0 72px 0 !important;
+    padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -391,33 +362,6 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     display: flex !important;
     flex-direction: column !important;
     min-height: unset !important;
-}
-
-/* Sabit alt footer — viewport tabanına pinli */
-.sidebar-footer-fixed {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    background: linear-gradient(180deg, rgba(7, 3, 17, 0) 0%, rgba(7, 3, 17, 0.94) 28%, rgba(7, 3, 17, 0.98) 100%) !important;
-    pointer-events: auto;
-}
-
-[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-footer-fixed) {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 0.75rem 0 0.85rem !important;
-    z-index: 20 !important;
-    overflow: visible !important;
-    pointer-events: none;
-    flex: 0 0 auto !important;
-}
-
-.sidebar-footer-fixed .status-indicator,
-.sidebar-footer-fixed .techlas-divider {
-    pointer-events: auto;
 }
 
 [data-testid="stSidebar"] [data-testid="stElementContainer"] {
@@ -459,16 +403,19 @@ section[data-testid="stSidebar"] > div::-webkit-scrollbar {
     margin: 11px 0 !important;
 }
 
-[data-testid="stSidebar"] .divider-bottom {
-    margin: 0 0 10px 0 !important;
+/* Veri Yönetimi — uploader ve kütüphane butonu arası minimum boşluk */
+[data-testid="stSidebar"] .sidebar-data-section {
+    margin-bottom: 6px !important;
 }
 
-/* Esnek boşluk — içerik üstte, durum göstergesi altta */
-.sidebar-flex-spacer {
-    flex: 1 1 auto;
-    min-height: 20px;
-    width: 100%;
-    display: block;
+[data-testid="stSidebar"] .sidebar-data-section + div [data-testid="stFileUploader"],
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-data-section) + [data-testid="stElementContainer"] [data-testid="stFileUploader"] {
+    margin-top: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploader"] + div [data-testid="stButton"],
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has([data-testid="stFileUploader"]) + [data-testid="stElementContainer"] [data-testid="stButton"] {
+    margin-top: 4px !important;
 }
 
 /* Sidebar İçi Başlıkların Varsayılan Boşluklarını Ezme */
@@ -947,27 +894,6 @@ section[data-testid="stSidebar"] > div::-webkit-scrollbar {
     color: #E2E8F0 !important;
 }
 
-/* Durum Göstergesi — sidebar alt */
-[data-testid="stSidebar"] .status-indicator {
-    width: 100%;
-    justify-content: center;
-    box-sizing: border-box;
-    margin: 0 !important;
-    padding: 7px 12px;
-    font-size: 0.72rem;
-    gap: 8px;
-}
-
-[data-testid="stSidebar"] .status-indicator-bottom {
-    margin-top: auto !important;
-    margin-bottom: 0 !important;
-}
-
-[data-testid="stSidebar"] .status-dot {
-    width: 7px;
-    height: 7px;
-}
-
 /* Dosya Yükleyici — Geliştirilmiş Görünüm */
 [data-testid="stSidebar"] [data-testid="stFileUploadDropzone"] {
     border-radius: 9px !important;
@@ -1141,18 +1067,4 @@ section[data-testid="stSidebar"] > div::-webkit-scrollbar {
 
 [data-testid="stSidebar"] .chat-history-row-active {
     display: none !important;
-}
-
-/* Durum göstergesi — footer içinde */
-[data-testid="stSidebar"] .sidebar-footer-fixed .status-indicator-bottom {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    border-top: none !important;
-    border-radius: 0 !important;
-    background: rgba(10, 4, 20, 0.75) !important;
-    width: 100% !important;
-}
-
-[data-testid="stSidebar"] .sidebar-footer-fixed .divider-bottom {
-    margin: 0 0 10px 0 !important;
 }

@@ -330,8 +330,8 @@ with st.sidebar:
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
 
     st.markdown("""
-        <div class="sidebar-section-header">
-            <p class="sidebar-section-title">Belge Yükle</p>
+        <div class="sidebar-section-header sidebar-data-section">
+            <p class="sidebar-section-title">Veri Yönetimi</p>
             <p class="sidebar-section-hint">PDF · TXT · MD · DOCX</p>
         </div>
     """, unsafe_allow_html=True)
@@ -356,10 +356,6 @@ with st.sidebar:
         st.session_state.son_yuklenen = (yuklenen_dosya.name, parca_sayisi)
         st.session_state.uploader_key += 1
         st.rerun()
-
-    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sidebar-section-header"><p class="sidebar-section-title">Veri Yönetimi</p></div>', unsafe_allow_html=True)
 
     if st.button(
         f"Kaynak Kütüphanesi ({len(kaynaklar)})",
@@ -407,16 +403,6 @@ with st.sidebar:
                 ):
                     _load_chat_session(sohbet["id"])
                     st.rerun()
-
-    st.markdown("""
-        <div class="sidebar-footer-fixed">
-            <div class="techlas-divider divider-bottom"></div>
-            <div class="status-indicator status-indicator-bottom">
-                <div class="status-dot"></div>
-                Motor Çevrimiçi · Kapalı Devre
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
 
 # 4. Ana Ekran Başlığı
 st.markdown('<h1 class="techlas-title">TechLas Workspace</h1>', unsafe_allow_html=True)
