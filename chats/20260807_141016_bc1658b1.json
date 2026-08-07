@@ -1,0 +1,16 @@
+{
+  "id": "20260807_141016_bc1658b1",
+  "title": "veri nedir?",
+  "created_at": "2026-08-07T14:13:06",
+  "updated_at": "2026-08-07T14:34:04",
+  "messages": [
+    {
+      "role": "user",
+      "content": "veri nedir?"
+    },
+    {
+      "role": "assistant",
+      "content": " Kaynak: yazılımDersNotu.pdf\nİçerik: eğiştirmek için kullanılır\n\nVeri, yazılımDersNotu.pdf dosyasında belirtilen belirli bir bölümün, eğitim yönteminden gelir, bu durumda \"eğiştirmek için kullanılır\" tanımlayan bilgi veya bilgilerdir. Bu, dosyada belirtilen yöntemin kullanımı veya amaçlarını tanımlayan belirli bir açıklamadır."
+    }
+  ]
+}

@@ -8,6 +8,7 @@ from document_manager import (
     get_library_stats,
     ingest_file,
 )
+import chat_history
 
 CHAT_TIMEOUT_SECONDS = 120
 
@@ -32,6 +33,10 @@ if "son_silinen" not in st.session_state:
     st.session_state.son_silinen = None
 if "silme_bekleyen" not in st.session_state:
     st.session_state.silme_bekleyen = None
+if "current_chat_id" not in st.session_state:
+    st.session_state.current_chat_id = chat_history.create_chat_id()
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
 # Bildirimler
 if st.session_state.son_yuklenen:
@@ -82,6 +87,25 @@ def _chat_hata_mesaji(exc: Exception) -> str:
 
 with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
+
+
+def _save_current_chat() -> None:
+    if st.session_state.messages:
+        chat_history.save_chat(st.session_state.current_chat_id, st.session_state.messages)
+
+
+def _start_new_chat() -> None:
+    _save_current_chat()
+    st.session_state.current_chat_id = chat_history.create_chat_id()
+    st.session_state.messages = []
+
+
+def _load_chat_session(chat_id: str) -> None:
+    if chat_id == st.session_state.current_chat_id:
+        return
+    _save_current_chat()
+    st.session_state.current_chat_id = chat_id
+    st.session_state.messages = chat_history.load_chat(chat_id)
 
 
 def hafizaya_ekle(dosya_adi: str) -> int:
@@ -148,7 +172,7 @@ def _silme_onay_ekrani(dosya_adi: str) -> None:
             st.rerun(scope="fragment")
 
 # --- KAYNAK KÜTÜPHANESİ DİYALOGU ---
-@st.dialog("📂 Kaynak Kütüphanesi", width="small", on_dismiss=_kutuphane_kapatildi)
+@st.dialog("Kaynak Kütüphanesi", width="small", on_dismiss=_kutuphane_kapatildi)
 def kaynak_kutuphanesi_goster():
     kaynaklar, toplam_parca = get_library_stats()
     hafizada_count = sum(1 for k in kaynaklar if k["indexed"])
@@ -217,6 +241,7 @@ def kaynak_kutuphanesi_goster():
 
 # 3. Sidebar — Profesyonel Kontrol Paneli
 kaynaklar, toplam_parca = get_library_stats()
+gecmis_sohbetler = chat_history.list_chats()
 
 with st.sidebar:
     st.markdown("""
@@ -228,6 +253,14 @@ with st.sidebar:
             </div>
         </div>
     """, unsafe_allow_html=True)
+
+    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="new-chat-marker"></div>', unsafe_allow_html=True)
+    if st.button("➕ Yeni Sohbet", use_container_width=True, type="primary", key="new_chat"):
+        _start_new_chat()
+        st.toast("Yeni sohbet başlatıldı", icon="✨")
+        st.rerun()
 
     st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
 
@@ -285,7 +318,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-section-header"><p class="sidebar-section-title">Veri Yönetimi</p></div>', unsafe_allow_html=True)
 
     if st.button(
-        f"📂 Kaynak Kütüphanesi ({len(kaynaklar)})",
+        f"Kaynak Kütüphanesi ({len(kaynaklar)})",
         use_container_width=True,
         key="open_library",
     ):
@@ -298,6 +331,37 @@ with st.sidebar:
                 f'<p class="sidebar-section-hint sidebar-hint-after-btn">{bekleyen} dosya henüz okunmadı</p>',
                 unsafe_allow_html=True,
             )
+
+    st.markdown('<div class="techlas-divider"></div>', unsafe_allow_html=True)
+
+    st.markdown(
+        f'<div class="sidebar-section-header chat-history-section">'
+        f'<p class="sidebar-section-title">Geçmiş Sohbetler</p>'
+        f'<p class="sidebar-section-hint">{len(gecmis_sohbetler)} kayıtlı oturum</p>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    if not gecmis_sohbetler:
+        st.markdown(
+            '<p class="sidebar-section-hint chat-history-empty">Henüz kayıtlı sohbet yok</p>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown('<div class="chat-history-list">', unsafe_allow_html=True)
+        for sohbet in gecmis_sohbetler[:20]:
+            aktif = sohbet["id"] == st.session_state.current_chat_id
+            etiket = sohbet["title"]
+            if st.button(
+                etiket,
+                key=f"hist_{sohbet['id']}",
+                use_container_width=True,
+                type="primary" if aktif else "secondary",
+                help=sohbet["date_label"],
+            ):
+                _load_chat_session(sohbet["id"])
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="sidebar-flex-spacer"></div>', unsafe_allow_html=True)
 
@@ -328,9 +392,6 @@ def render_chat_message(role: str, content: str) -> None:
         st.markdown(content)
 
 # 5. Sohbet Geçmişi
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
 for msg in st.session_state.messages:
     render_chat_message(msg["role"], msg["content"])
 
@@ -392,3 +453,4 @@ BAĞLAM:
                 st.warning(cevap)
 
             st.session_state.messages.append({"role": "assistant", "content": cevap})
+            _save_current_chat()

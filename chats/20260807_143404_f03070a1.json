@@ -1,0 +1,16 @@
+{
+  "id": "20260807_143404_f03070a1",
+  "title": "python nedir?",
+  "created_at": "2026-08-07T14:36:14",
+  "updated_at": "2026-08-07T14:36:14",
+  "messages": [
+    {
+      "role": "user",
+      "content": "python nedir?"
+    },
+    {
+      "role": "assistant",
+      "content": " Kaynak: yazılımDersNotu.pdf\nİçerik: Python, yazılım dersleri için kullanılan özelliğe sahip bir düşünce yazılım tabanısıdır. Durum Çubuğu: Belgemizdeki Python sayfalarını, hangi sayfada olduğumuzu ve toplam kullanılan sözcük sayısını belirtir. Yazım Denetimi Düğmesi: Belgemizin yazım yanlışlarını kontrol edebilirsiniz. Belge Görünüm Düğmeleri: Belgemizin görünümünü sayfa düzeni, tam ekran okuma, web düzeni gibi değiştirmeleri sağlar. Yeniden Boyutlandırma (Yakınlaştır): Belgemizin görünümünü yakınlaştırıp uzaklaştırır.\n\nPython, düşünce yazılımının temel tabanı olan öz"
+    }
+  ]
+}
