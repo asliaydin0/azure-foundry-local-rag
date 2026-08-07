@@ -339,39 +339,47 @@ section[data-testid="stSidebar"] {
     padding: 0 !important;
 }
 
-/* Sidebar — dengeli padding, profesyonel dikey ritim */
+/* Sidebar — tek dış scroll yok; footer sabit, içerik kayar */
 section[data-testid="stSidebar"] > div {
-    height: 100% !important;
+    height: 100vh !important;
     max-height: 100vh !important;
-    overflow-y: auto !important;
+    overflow: hidden !important;
     overflow-x: hidden !important;
-    padding: 0.85rem 0.75rem 0.75rem 0.85rem !important;
+    padding: 0.85rem 0.75rem 0 0.85rem !important;
     box-sizing: border-box !important;
-    scrollbar-width: thin;
-    scrollbar-color: #9328cd transparent;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
-/* İç katman — esnek düzen, durum göstergesi alta */
+/* Ana sidebar içeriği — footer hariç kaydırılabilir alan */
 [data-testid="stSidebarContent"],
 div[data-testid="stSidebarUserContent"] {
-    overflow: visible !important;
     overflow-x: hidden !important;
-    height: auto !important;
-    min-height: calc(100vh - 1.6rem) !important;
-    max-height: none !important;
-    padding: 0 !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    padding: 0 0 72px 0 !important;
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 0 !important;
+    scrollbar-width: none;
 }
 
-/* Streamlit blokları — hafif nefes payı + dikey dağılım */
+[data-testid="stSidebarContent"]::-webkit-scrollbar,
+div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* Streamlit blokları — gereksiz min-height kaldır */
 [data-testid="stSidebar"] div[data-testid="stSidebarUserContent"] > div {
     display: flex !important;
     flex-direction: column !important;
-    flex: 1 1 auto !important;
-    min-height: calc(100vh - 1.6rem) !important;
+    flex: 0 0 auto !important;
+    min-height: unset !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stVerticalBlock"],
@@ -379,36 +387,37 @@ div[data-testid="stSidebarUserContent"] {
     gap: 0.35rem !important;
     padding: 0 !important;
     margin: 0 !important;
-    flex: 1 1 auto !important;
+    flex: 0 0 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    min-height: calc(100vh - 1.6rem) !important;
+    min-height: unset !important;
 }
 
-/* Esnek boşluk — durum göstergesini alta iter */
-[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-flex-spacer) {
-    flex: 1 1 auto !important;
-    min-height: 20px !important;
-    margin: 0 !important;
-    padding: 0 !important;
+/* Sabit alt footer — viewport tabanına pinli */
+.sidebar-footer-fixed {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(180deg, rgba(7, 3, 17, 0) 0%, rgba(7, 3, 17, 0.94) 28%, rgba(7, 3, 17, 0.98) 100%) !important;
+    pointer-events: auto;
 }
 
-[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-flex-spacer) p,
-[data-testid="stSidebar"] .sidebar-flex-spacer {
-    height: 100% !important;
-    min-height: 20px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.status-indicator-bottom) {
-    position: sticky !important;
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.sidebar-footer-fixed) {
+    position: absolute !important;
     bottom: 0 !important;
-    margin-top: auto !important;
-    z-index: 10 !important;
-    background: linear-gradient(180deg, rgba(14, 7, 29, 0) 0%, rgba(14, 7, 29, 0.92) 35%, rgba(14, 7, 29, 0.98) 100%) !important;
-    padding-top: 10px !important;
-    padding-bottom: 4px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 0.75rem 0 0.85rem !important;
+    z-index: 20 !important;
+    overflow: visible !important;
+    pointer-events: none;
+    flex: 0 0 auto !important;
+}
+
+.sidebar-footer-fixed .status-indicator,
+.sidebar-footer-fixed .techlas-divider {
+    pointer-events: auto;
 }
 
 [data-testid="stSidebar"] [data-testid="stElementContainer"] {
@@ -432,28 +441,13 @@ div[data-testid="stSidebarUserContent"] {
     padding: 0 !important;
 }
 
-/* Dış scrollbar — sidebar'ın en sağ kenarı, tam yükseklik */
+/* Sidebar dış scrollbar devre dışı — scroll yalnızca geçmiş listesinde */
 section[data-testid="stSidebar"] > div::-webkit-scrollbar {
-    width: 5px !important;
-}
-section[data-testid="stSidebar"] > div::-webkit-scrollbar-track {
-    background: transparent !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-section[data-testid="stSidebar"] > div::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #9328cd, #00F0FF) !important;
-    border-radius: 10px !important;
-    min-height: 40px;
-}
-
-/* İç scrollbar gizli */
-[data-testid="stSidebarContent"]::-webkit-scrollbar,
-div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
 }
 
+/* İç scrollbar gizli — ana içerik gerekirse sessizce kayar */
 /* Özel İnce Neon Ayraç Çizgisi */
 .techlas-divider {
     height: 1px;
@@ -1055,31 +1049,54 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     font-style: italic;
 }
 
-/* Geçmiş sohbet kaydırma alanı */
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) {
+/* Geçmiş sohbet — yalnızca liste kutusunda scroll */
+.chat-history-scroll-box {
+    display: block;
+    width: 100%;
+    max-height: 300px;
+    margin: 0;
+    padding: 0;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"]:has(.chat-history-scroll-inner),
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-scroll-inner) [data-testid="stVerticalBlockBorderWrapper"] {
     max-height: 300px !important;
+    height: 300px !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    flex: 0 0 auto !important;
+    min-height: unset !important;
     padding-right: 2px !important;
     scrollbar-width: thin;
     scrollbar-color: rgba(147, 40, 205, 0.35) transparent;
 }
 
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar {
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"]:has(.chat-history-scroll-inner)::-webkit-scrollbar,
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-scroll-inner) [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar {
     width: 4px !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-track {
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-track,
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-scroll-inner) [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar-track {
     background: transparent !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-thumb {
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-thumb,
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-scroll-inner) [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar-thumb {
     background: rgba(147, 40, 205, 0.35) !important;
     border-radius: 6px !important;
 }
 
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-thumb:hover {
+[data-testid="stSidebar"] [data-testid="stVerticalBlockBorderWrapper"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-thumb:hover,
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-scroll-inner) [data-testid="stVerticalBlockBorderWrapper"]::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 240, 255, 0.4) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) {
+    max-height: none !important;
+    overflow: visible !important;
+    flex: 0 0 auto !important;
+    min-height: unset !important;
 }
 
 /* Geçmiş sohbet — minimalist liste satırları */
@@ -1126,11 +1143,16 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     display: none !important;
 }
 
-/* Durum göstergesi — alt sabitleme */
-[data-testid="stSidebar"] .status-indicator-bottom {
+/* Durum göstergesi — footer içinde */
+[data-testid="stSidebar"] .sidebar-footer-fixed .status-indicator-bottom {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    border-top: 1px solid rgba(147, 40, 205, 0.12) !important;
+    border-top: none !important;
     border-radius: 0 !important;
     background: rgba(10, 4, 20, 0.75) !important;
+    width: 100% !important;
+}
+
+[data-testid="stSidebar"] .sidebar-footer-fixed .divider-bottom {
+    margin: 0 0 10px 0 !important;
 }

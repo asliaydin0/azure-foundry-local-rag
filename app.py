@@ -408,15 +408,13 @@ with st.sidebar:
                     _load_chat_session(sohbet["id"])
                     st.rerun()
 
-    st.markdown('<div class="sidebar-flex-spacer"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-status-anchor"></div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="techlas-divider divider-bottom"></div>', unsafe_allow_html=True)
-
     st.markdown("""
-        <div class="status-indicator status-indicator-bottom">
-            <div class="status-dot"></div>
-            Motor Çevrimiçi · Kapalı Devre
+        <div class="sidebar-footer-fixed">
+            <div class="techlas-divider divider-bottom"></div>
+            <div class="status-indicator status-indicator-bottom">
+                <div class="status-dot"></div>
+                Motor Çevrimiçi · Kapalı Devre
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
