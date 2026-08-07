@@ -1,4 +1,5 @@
 import concurrent.futures
+import re
 import streamlit as st
 import os
 import html
@@ -84,6 +85,49 @@ def _chat_hata_mesaji(exc: Exception) -> str:
     if "cancelled" in mesaj or "canceled" in mesaj:
         return "⏱️ Modelin cevap verme süresi aşıldı. Lütfen daha kısa bir soru sorun veya işlemi tekrarlayın."
     return f"❌ Sistem Hatası: {exc}"
+
+
+_META_LEAK_RE = re.compile(
+    r"^(?:Kaynak|Kaynaklar|İçerik|Belge|Source|Content|Document)\s*[:\-]\s*.+?(?:\n|$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+_COMBINED_META_RE = re.compile(
+    r"^(?:Kaynak|Kaynaklar)\s*[:\-][^\n]*(?:\s*İçerik\s*[:\-][^\n]*)?",
+    re.IGNORECASE,
+)
+
+
+def _sanitize_assistant_reply(text: str) -> str:
+    """Modelin bağlam meta verilerini kopyalamasını temizler."""
+    cleaned = (text or "").strip()
+    for _ in range(4):
+        updated = _COMBINED_META_RE.sub("", cleaned).strip()
+        updated = _META_LEAK_RE.sub("", updated).strip()
+        if updated == cleaned:
+            break
+        cleaned = updated
+    return cleaned
+
+
+def _build_rag_system_prompt(baglam_metni: str) -> str:
+    return f"""Sen TechLas firmasının resmi yapay zeka asistanısın.
+
+GÖREVİN:
+Kullanıcının sorusunu YALNIZCA aşağıdaki BAĞLAM bölümündeki bilgilerle cevapla.
+
+KESİN KURALLAR (İHLAL EDİLEMEZ):
+1. Bağlamda cevap yoksa SADECE şunu yaz: "Üzgünüm, mevcut veritabanımda bu konu hakkında bir bilgi bulunmuyor."
+2. Tahmin yürütme, bilgi uydurma, parçaları birleştirip çıkarım yapma.
+3. YANIT FORMATI — ÇOK ÖNEMLİ:
+   - Cevabına DOĞRUDAN konuya girerek başla. İlk cümle sorunun cevabı olsun.
+   - "Kaynak", "İçerik", "Belge", "Context", "Source", "Content" kelimelerini ASLA yazma.
+   - Dosya adı, uzantı (.pdf, .docx), parça numarası veya meta etiket KULLANMA.
+   - Bağlamdaki etiketleri, başlıkları veya yapıyı cevaba KOPYALAMA.
+   - Kaynaklar arayüzde ayrı gösterilir; sen sadece doğal, akıcı Türkçe cevap ver.
+
+BAĞLAM (iç yapıyı kullanıcıya yansıtma):
+{baglam_metni}
+"""
 
 with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
@@ -348,22 +392,24 @@ with st.sidebar:
             unsafe_allow_html=True,
         )
     else:
-        st.markdown('<div class="chat-history-list">', unsafe_allow_html=True)
-        for sohbet in gecmis_sohbetler[:20]:
-            aktif = sohbet["id"] == st.session_state.current_chat_id
-            etiket = sohbet["title"]
-            if st.button(
-                etiket,
-                key=f"hist_{sohbet['id']}",
-                use_container_width=True,
-                type="primary" if aktif else "secondary",
-                help=sohbet["date_label"],
-            ):
-                _load_chat_session(sohbet["id"])
-                st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(height=300, border=False, gap=0):
+            st.markdown('<span class="chat-history-scroll-inner"></span>', unsafe_allow_html=True)
+            for sohbet in gecmis_sohbetler[:20]:
+                aktif = sohbet["id"] == st.session_state.current_chat_id
+                if aktif:
+                    st.markdown('<span class="chat-history-row-active"></span>', unsafe_allow_html=True)
+                if st.button(
+                    sohbet["title"],
+                    key=f"hist_{sohbet['id']}",
+                    use_container_width=True,
+                    type="secondary",
+                    help=sohbet["date_label"],
+                ):
+                    _load_chat_session(sohbet["id"])
+                    st.rerun()
 
     st.markdown('<div class="sidebar-flex-spacer"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-status-anchor"></div>', unsafe_allow_html=True)
 
     st.markdown('<div class="techlas-divider divider-bottom"></div>', unsafe_allow_html=True)
 
@@ -406,20 +452,7 @@ if prompt := st.chat_input("Veritabanında aramak istediğiniz konuyu yazın..."
             bulunan_dokumanlar = retriever.search(prompt, top_k=2)
             baglam_metni = build_context(bulunan_dokumanlar)
 
-            system_prompt = f"""Sen TechLas firmasının resmi ve son derece katı kuralları olan yapay zeka asistanısın.
-
-GÖREVİN: 
-Kullanıcının sorusunu SADECE ama SADECE aşağıdaki BAĞLAM bölümünde verilen metinleri okuyarak cevaplamak.
-
-KESİN KURALLAR (BUNLARI İHLAL EDEMEZSİN):
-1. Eğer kullanıcının sorduğu soru BAĞLAM metninin içinde AÇIKÇA VE DOĞRUDAN geçmiyorsa, parçaları birleştirip tahmin yürütmek KESİNLİKLE YASAKTIR.
-2. Bağlamda cevabı olmayan sorular için SADECE şu cümleyi kuracaksın: "Üzgünüm, mevcut veritabanımda bu konu hakkında bir bilgi bulunmuyor." Başka hiçbir kelime ekleme.
-3. Asla sahte tanımlar üretme.
-4. Cevabına KESİNLİKLE "Kaynak:", "İçerik:", veya "Belge:" gibi kelimelerle başlama. Sana sunulan bağlamdaki (context) meta verileri veya dosya isimlerini asla metnin içine yazma. Sadece doğrudan ve doğal bir asistan gibi sorunun cevabını ver. Kaynaklar zaten sistem tarafından arayüzde ayrıca gösterilmektedir.
-
-BAĞLAM:
-{baglam_metni}
-"""
+            system_prompt = _build_rag_system_prompt(baglam_metni)
 
             try:
                 response = complete_chat_with_timeout(
@@ -435,6 +468,8 @@ BAĞLAM:
                     cevap = response.choices[0].message.content
                 else:
                     cevap = str(response)
+
+                cevap = _sanitize_assistant_reply(cevap)
 
                 st.markdown(cevap)
 

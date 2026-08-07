@@ -32,9 +32,9 @@ def build_context(documents: list) -> str:
     parts: list[str] = []
     total_len = 0
 
-    for doc in documents:
+    for i, doc in enumerate(documents, start=1):
         snippet = truncate_text(doc.get("text", ""), MAX_CHUNK_CHARS)
-        block = f"- Kaynak: {doc['source']}\n  İçerik: {snippet}"
+        block = f"[{i}]\n{snippet}"
         block_len = len(block)
 
         if total_len + block_len > MAX_CONTEXT_CHARS:

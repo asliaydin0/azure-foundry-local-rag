@@ -402,7 +402,13 @@ div[data-testid="stSidebarUserContent"] {
 }
 
 [data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.status-indicator-bottom) {
+    position: sticky !important;
+    bottom: 0 !important;
     margin-top: auto !important;
+    z-index: 10 !important;
+    background: linear-gradient(180deg, rgba(14, 7, 29, 0) 0%, rgba(14, 7, 29, 0.92) 35%, rgba(14, 7, 29, 0.98) 100%) !important;
+    padding-top: 10px !important;
+    padding-bottom: 4px !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stElementContainer"] {
@@ -927,12 +933,24 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
     border-bottom: 1px solid rgba(147, 40, 205, 0.2);
 }
 
-/* Kaynak Kütüphanesi açma butonu — sidebar */
+/* Kaynak Kütüphanesi ve sidebar aksiyon butonları — düz, sade */
 [data-testid="stSidebar"] [data-testid="stButton"] button {
     font-size: 0.78rem !important;
-    min-height: 36px !important;
-    height: 36px !important;
+    min-height: 34px !important;
+    height: auto !important;
     padding: 6px 12px !important;
+    background: transparent !important;
+    border: 1px solid rgba(147, 40, 205, 0.12) !important;
+    box-shadow: none !important;
+    color: #C8C0D8 !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stButton"] button:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(147, 40, 205, 0.22) !important;
+    box-shadow: none !important;
+    color: #E2E8F0 !important;
 }
 
 /* Durum Göstergesi — sidebar alt */
@@ -1004,27 +1022,27 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
    SOHBET GEÇMİŞİ — YENİ SOHBET & HISTORY LİSTESİ
    ========================================================= */
 
-/* Yeni Sohbet — birincil aksiyon butonu */
+/* Yeni Sohbet — sade birincil aksiyon */
 [data-testid="stSidebar"] .new-chat-marker + div [data-testid="stButton"] button,
 [data-testid="stSidebar"] .new-chat-marker ~ div [data-testid="stButton"]:first-of-type button {
-    background: linear-gradient(135deg, rgba(147, 40, 205, 0.22), rgba(0, 240, 255, 0.12)) !important;
-    border: 1px solid rgba(0, 240, 255, 0.55) !important;
+    background: rgba(0, 240, 255, 0.06) !important;
+    border: 1px solid rgba(0, 240, 255, 0.22) !important;
     color: #00F0FF !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.3px;
-    min-height: 38px !important;
-    height: 38px !important;
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.12) !important;
-    transition: all 0.25s ease !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px;
+    min-height: 36px !important;
+    height: 36px !important;
+    box-shadow: none !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
 }
 
 [data-testid="stSidebar"] .new-chat-marker + div [data-testid="stButton"] button:hover,
 [data-testid="stSidebar"] .new-chat-marker ~ div [data-testid="stButton"]:first-of-type button:hover {
-    background: linear-gradient(135deg, rgba(147, 40, 205, 0.35), rgba(0, 240, 255, 0.2)) !important;
-    border-color: #D926A9 !important;
+    background: rgba(0, 240, 255, 0.1) !important;
+    border-color: rgba(0, 240, 255, 0.35) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 0 18px rgba(217, 38, 169, 0.35), 0 0 12px rgba(0, 240, 255, 0.25) !important;
-    transform: translateY(-1px);
+    box-shadow: none !important;
+    transform: none;
 }
 
 .chat-history-section {
@@ -1032,50 +1050,87 @@ div[data-testid="stSidebarUserContent"]::-webkit-scrollbar {
 }
 
 .chat-history-empty {
-    text-align: center;
-    padding: 6px 0 2px 0;
+    text-align: left;
+    padding: 4px 2px 2px 2px;
     font-style: italic;
 }
 
-/* Geçmiş sohbet listesi — kompakt neon pill butonlar */
-[data-testid="stSidebar"] .chat-history-list ~ div [data-testid="stButton"] button,
-[data-testid="stSidebar"] .chat-history-section ~ div [data-testid="stButton"] button {
-    background: rgba(14, 7, 29, 0.45) !important;
-    border: 1px solid rgba(147, 40, 205, 0.35) !important;
-    color: #D3CEE6 !important;
+/* Geçmiş sohbet kaydırma alanı */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) {
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-right: 2px !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(147, 40, 205, 0.35) transparent;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-thumb {
+    background: rgba(147, 40, 205, 0.35) !important;
+    border-radius: 6px !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner)::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 240, 255, 0.4) !important;
+}
+
+/* Geçmiş sohbet — minimalist liste satırları */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) [data-testid="stButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) [data-testid="stButton"] button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #9B93AD !important;
     text-align: left !important;
     justify-content: flex-start !important;
-    font-size: 0.72rem !important;
-    min-height: 34px !important;
-    height: auto !important;
-    padding: 7px 10px !important;
+    font-size: 0.71rem !important;
+    font-weight: 400 !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 4px 8px !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 4px !important;
-    transition: all 0.22s ease !important;
+    transition: background 0.18s ease, color 0.18s ease !important;
 }
 
-[data-testid="stSidebar"] .chat-history-list ~ div [data-testid="stButton"] button:hover,
-[data-testid="stSidebar"] .chat-history-section ~ div [data-testid="stButton"] button:hover {
-    border-color: rgba(0, 240, 255, 0.55) !important;
-    color: #00F0FF !important;
-    background: rgba(0, 240, 255, 0.08) !important;
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.15) !important;
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) [data-testid="stButton"] button:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #D3CEE6 !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-/* Aktif sohbet — vurgulu seçim */
-[data-testid="stSidebar"] .chat-history-list ~ div [data-testid="stButton"] button[kind="primary"],
-[data-testid="stSidebar"] .chat-history-section ~ div [data-testid="stButton"] button[kind="primary"] {
-    background: rgba(217, 38, 169, 0.12) !important;
-    border-color: rgba(217, 38, 169, 0.55) !important;
-    color: #FF6EC7 !important;
-    box-shadow: inset 0 0 12px rgba(217, 38, 169, 0.12), 0 0 10px rgba(217, 38, 169, 0.18) !important;
+/* Aktif sohbet satırı */
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-row-active) + [data-testid="stElementContainer"] [data-testid="stButton"] button {
+    color: #D3CEE6 !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    font-weight: 500 !important;
 }
 
-[data-testid="stSidebar"] .chat-history-list ~ div [data-testid="stButton"] button[kind="primary"]:hover,
-[data-testid="stSidebar"] .chat-history-section ~ div [data-testid="stButton"] button[kind="primary"]:hover {
-    border-color: #D926A9 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 0 14px rgba(217, 38, 169, 0.35) !important;
+[data-testid="stSidebar"] .chat-history-row-active {
+    display: none !important;
+}
+
+/* Durum göstergesi — alt sabitleme */
+[data-testid="stSidebar"] .status-indicator-bottom {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-top: 1px solid rgba(147, 40, 205, 0.12) !important;
+    border-radius: 0 !important;
+    background: rgba(10, 4, 20, 0.75) !important;
 }

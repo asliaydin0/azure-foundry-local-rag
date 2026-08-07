@@ -1,0 +1,16 @@
+{
+  "id": "20260807_151018_a3254448",
+  "title": "İşletim Sistemi Nasıl Yüklenir?",
+  "created_at": "2026-08-07T15:13:13",
+  "updated_at": "2026-08-07T15:13:13",
+  "messages": [
+    {
+      "role": "user",
+      "content": "İşletim Sistemi Nasıl Yüklenir?"
+    },
+    {
+      "role": "assistant",
+      "content": "CD/DVD veya USB disk kullanılarak işletim sistemi kurulabilir, ancak kurulacak bilgisayarın donanımı için ihtiyat gereklidir."
+    }
+  ]
+}
