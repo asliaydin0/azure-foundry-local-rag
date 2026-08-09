@@ -5,6 +5,7 @@ from database import DB_NAME
 
 MAX_CHUNK_CHARS = 500
 MAX_CONTEXT_CHARS = 1800
+SIMILARITY_THRESHOLD = 0.55
 
 
 def truncate_text(text: str, max_chars: int) -> str:
@@ -54,49 +55,49 @@ class VectorRetriever:
         print("🔍 Arama motoru başlatılıyor...")
         self.embedder = LocalEmbedder()
         
-    def search(self, query: str, top_k: int = 2):
+    def search(self, query: str, top_k: int = 2, min_score: float = SIMILARITY_THRESHOLD):
         """Kullanıcının sorusuna en uygun 'top_k' sayıdaki dökümanı bulur."""
         print(f"\nSoru: '{query}'")
         print("Soru vektöre çevriliyor ve veritabanında aranıyor...")
-        
-        # 1. Kullanıcının sorusunu vektöre çevir
-        query_vector = self.embedder.embed_text(query)
-        if query_vector is None:
-            return []
-            
-        # 2. Veritabanındaki tüm dökümanları çek
+
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute("SELECT id, source_file, chunk_text, embedding_vector FROM documents")
         rows = cursor.fetchall()
         conn.close()
-        
+
+        if not rows:
+            return []
+
+        query_vector = self.embedder.embed_text(query)
+        if query_vector is None:
+            return []
+
         results = []
-        
-        # 3. Her bir döküman ile sorunun benzerliğini hesapla
+
         for row in rows:
             doc_id = row[0]
             source = row[1]
             text = row[2]
             blob_data = row[3]
-            
-            # BLOB verisini tekrar numpy dizisine çevir
+
             doc_vector = self.embedder.blob_to_vector(blob_data)
-            
-            # Benzerlik skorunu hesapla
             score = cosine_similarity(query_vector, doc_vector)
-            
+
             results.append({
                 "id": doc_id,
                 "source": source,
                 "text": text,
                 "score": score
             })
-            
-        # 4. Sonuçları en yüksek skordan en düşüğe doğru sırala
+
         results.sort(key=lambda x: x["score"], reverse=True)
-        
-        top_results = results[:top_k]
+
+        top_results = [
+            item for item in results
+            if item["score"] >= min_score
+        ][:top_k]
+
         for item in top_results:
             item["text"] = truncate_text(item["text"], MAX_CHUNK_CHARS)
         return top_results

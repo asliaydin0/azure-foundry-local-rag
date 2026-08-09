@@ -12,6 +12,10 @@ from document_manager import (
 import chat_history
 
 CHAT_TIMEOUT_SECONDS = 120
+NO_CONTEXT_MESSAGE = (
+    "⚠️ Sistem hafızasında bu soruyu yanıtlayacak uygun bir bağlam/belge bulunamadı."
+)
+MODEL_INIT_ERROR = "❌ Model başlatılamadı veya donanım yetersiz."
 
 # 1. Sayfa Tasarımı ve Temel Ayarlar
 st.set_page_config(page_title="TechLas Workspace", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
@@ -54,7 +58,7 @@ if st.session_state.son_silinen:
 
 # 2. AI Sistemi (Sidebar'dan önce — dosya işlemleri embedder gerektirir)
 @st.cache_resource
-def load_ai_system(_retriever_version: int = 2):
+def load_ai_system(_retriever_version: int = 3):
     retriever = VectorRetriever()
     manager = retriever.embedder.manager
 
@@ -62,13 +66,17 @@ def load_ai_system(_retriever_version: int = 2):
     modeller = manager.catalog.list_models()
     llm_model = next((m for m in modeller if m.id == hedef_model_id), None)
 
-    llm_model.load()
-    chat_client = llm_model.get_chat_client()
+    if llm_model is None:
+        return retriever, None
 
-    chat_client.settings.max_tokens = 300
-    chat_client.settings.temperature = 0.1
-
-    return retriever, chat_client
+    try:
+        llm_model.load()
+        chat_client = llm_model.get_chat_client()
+        chat_client.settings.max_tokens = 300
+        chat_client.settings.temperature = 0.1
+        return retriever, chat_client
+    except Exception:
+        return retriever, None
 
 
 def complete_chat_with_timeout(chat_client, messages, timeout: int = CHAT_TIMEOUT_SECONDS):
@@ -131,6 +139,8 @@ BAĞLAM (iç yapıyı kullanıcıya yansıtma):
 
 with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
+
+model_hazir = chat_client is not None
 
 
 def _save_current_chat() -> None:
@@ -426,7 +436,13 @@ for msg in st.session_state.messages:
     render_chat_message(msg["role"], msg["content"])
 
 # 6. RAG Sohbet
-if prompt := st.chat_input("Veritabanında aramak istediğiniz konuyu yazın..."):
+if not model_hazir:
+    st.error(MODEL_INIT_ERROR)
+
+if prompt := st.chat_input(
+    "Veritabanında aramak istediğiniz konuyu yazın...",
+    disabled=not model_hazir,
+):
     render_chat_message("user", prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -434,42 +450,45 @@ if prompt := st.chat_input("Veritabanında aramak istediğiniz konuyu yazın..."
         st.markdown('<span class="chat-role-marker chat-role-assistant"></span>', unsafe_allow_html=True)
         with st.spinner("Veriler analiz ediliyor..."):
             bulunan_dokumanlar = retriever.search(prompt, top_k=2)
-            baglam_metni = build_context(bulunan_dokumanlar)
 
-            system_prompt = _build_rag_system_prompt(baglam_metni)
-
-            try:
-                response = complete_chat_with_timeout(
-                    chat_client,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": prompt},
-                    ],
-                    timeout=CHAT_TIMEOUT_SECONDS,
-                )
-
-                if hasattr(response, "choices"):
-                    cevap = response.choices[0].message.content
-                else:
-                    cevap = str(response)
-
-                cevap = _sanitize_assistant_reply(cevap)
-
-                st.markdown(cevap)
-
-                with st.expander("📎 Kaynak Detayları", expanded=False):
-                    for i, doc in enumerate(bulunan_dokumanlar):
-                        st.markdown(
-                            f'<div class="source-terminal-block">'
-                            f'<span class="source-terminal-label">Kaynak {i + 1}: {html.escape(doc["source"])}</span>'
-                            f'<pre class="source-terminal-text">{html.escape(doc["text"])}</pre>'
-                            f'</div>',
-                            unsafe_allow_html=True,
-                        )
-
-            except Exception as e:
-                cevap = _chat_hata_mesaji(e)
+            if not bulunan_dokumanlar:
+                cevap = NO_CONTEXT_MESSAGE
                 st.warning(cevap)
+            else:
+                baglam_metni = build_context(bulunan_dokumanlar)
+                system_prompt = _build_rag_system_prompt(baglam_metni)
+
+                try:
+                    response = complete_chat_with_timeout(
+                        chat_client,
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": prompt},
+                        ],
+                        timeout=CHAT_TIMEOUT_SECONDS,
+                    )
+
+                    if hasattr(response, "choices"):
+                        cevap = response.choices[0].message.content
+                    else:
+                        cevap = str(response)
+
+                    cevap = _sanitize_assistant_reply(cevap)
+                    st.markdown(cevap)
+
+                    with st.expander("📎 Kaynak Detayları", expanded=False):
+                        for i, doc in enumerate(bulunan_dokumanlar):
+                            st.markdown(
+                                f'<div class="source-terminal-block">'
+                                f'<span class="source-terminal-label">Kaynak {i + 1}: {html.escape(doc["source"])}</span>'
+                                f'<pre class="source-terminal-text">{html.escape(doc["text"])}</pre>'
+                                f'</div>',
+                                unsafe_allow_html=True,
+                            )
+
+                except Exception as e:
+                    cevap = _chat_hata_mesaji(e)
+                    st.warning(cevap)
 
             st.session_state.messages.append({"role": "assistant", "content": cevap})
             _save_current_chat()
