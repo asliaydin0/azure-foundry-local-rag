@@ -1,0 +1,24 @@
+{
+  "id": "20260809_134949_810722e5",
+  "title": "işletim sistemi nedir?",
+  "created_at": "2026-08-09T13:52:38",
+  "updated_at": "2026-08-09T13:56:53",
+  "messages": [
+    {
+      "role": "user",
+      "content": "işletim sistemi nedir?"
+    },
+    {
+      "role": "assistant",
+      "content": "Bilgisayarda çalışan, bilgisayar donanımını yöneten ve dictatör olarak uygulama yazılımları için yaygın servisleri sağlayan sistem yazılımıdır: işletim sistemi."
+    },
+    {
+      "role": "user",
+      "content": "peki bu işletim sistemini nasıl yükleyeceğim?"
+    },
+    {
+      "role": "assistant",
+      "content": "CD/DVD veya USB disk kullanarak yükleyeceğin işletim sistemi:\n\n\nÖzet:\nBilgisayarın CD/DVD veya USB disk ile işletim sistemi yükleyeceğini belirtir, ancak desteklemeler gerektirir."
+    }
+  ]
+}

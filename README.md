@@ -113,7 +113,7 @@ azure-foundry-local-rag/
 ### 1. Depoyu klonlayın
 
 ```bash
-git clone https://github.com/<kullanici>/azure-foundry-local-rag.git
+git clone https://github.com/asliaydin0/azure-foundry-local-rag.git
 cd azure-foundry-local-rag
 ```
 
