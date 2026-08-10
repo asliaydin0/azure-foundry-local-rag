@@ -49,6 +49,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "pending_prompt" not in st.session_state:
     st.session_state.pending_prompt = None
+if "son_gecmis_toast" not in st.session_state:
+    st.session_state.son_gecmis_toast = None
 
 # Bildirimler
 if st.session_state.son_yuklenen:
@@ -62,6 +64,10 @@ if st.session_state.son_yuklenen:
 if st.session_state.son_silinen:
     st.toast(st.session_state.son_silinen, icon="✅")
     st.session_state.son_silinen = None
+
+if st.session_state.son_gecmis_toast:
+    st.toast(st.session_state.son_gecmis_toast, icon="🗑️")
+    st.session_state.son_gecmis_toast = None
 
 # 2. AI Sistemi (Sidebar'dan önce — dosya işlemleri embedder gerektirir)
 @st.cache_resource
@@ -227,6 +233,21 @@ def _load_chat_session(chat_id: str) -> None:
     _save_current_chat()
     st.session_state.current_chat_id = chat_id
     st.session_state.messages = chat_history.load_chat(chat_id)
+
+
+def _sil_chat_oturumu(chat_id: str) -> None:
+    chat_history.delete_chat(chat_id)
+    if chat_id == st.session_state.current_chat_id:
+        st.session_state.current_chat_id = chat_history.create_chat_id()
+        st.session_state.messages = []
+        st.session_state.pending_prompt = None
+
+
+def _tum_gecmisi_temizle() -> None:
+    chat_history.delete_all_chats()
+    st.session_state.current_chat_id = chat_history.create_chat_id()
+    st.session_state.messages = []
+    st.session_state.pending_prompt = None
 
 
 def hafizaya_ekle(dosya_adi: str) -> int:
@@ -465,21 +486,42 @@ with st.sidebar:
             unsafe_allow_html=True,
         )
     else:
-        with st.container(height=300, border=False, gap=0):
+        with st.container(height=300, border=False):
             st.markdown('<span class="chat-history-scroll-inner"></span>', unsafe_allow_html=True)
             for sohbet in gecmis_sohbetler[:20]:
                 aktif = sohbet["id"] == st.session_state.current_chat_id
-                if aktif:
-                    st.markdown('<span class="chat-history-row-active"></span>', unsafe_allow_html=True)
-                if st.button(
-                    sohbet["title"],
-                    key=f"hist_{sohbet['id']}",
-                    use_container_width=True,
-                    type="secondary",
-                    help=sohbet["date_label"],
-                ):
-                    _load_chat_session(sohbet["id"])
-                    st.rerun()
+                satir_col, sil_col = st.columns([5.4, 1], gap="small")
+                with satir_col:
+                    baslik = f"▸ {sohbet['title']}" if aktif else sohbet["title"]
+                    if st.button(
+                        baslik,
+                        key=f"hist_{sohbet['id']}",
+                        use_container_width=True,
+                        type="secondary",
+                        help=sohbet["date_label"],
+                    ):
+                        _load_chat_session(sohbet["id"])
+                        st.rerun()
+                with sil_col:
+                    if st.button(
+                        "🗑",
+                        key=f"hist_del_{sohbet['id']}",
+                        help="Bu sohbeti sil",
+                    ):
+                        _sil_chat_oturumu(sohbet["id"])
+                        st.session_state.son_gecmis_toast = "Sohbet geçmişten silindi!"
+                        st.rerun()
+
+        st.markdown('<div class="chat-history-clear-marker"></div>', unsafe_allow_html=True)
+        if st.button(
+            "🗑️ Tüm Geçmişi Temizle",
+            key="clear_all_history",
+            use_container_width=True,
+            type="secondary",
+        ):
+            _tum_gecmisi_temizle()
+            st.session_state.son_gecmis_toast = "Geçmiş sohbetler temizlendi!"
+            st.rerun()
 
 # 4. Ana Ekran — başlık yalnızca aktif sohbette
 if st.session_state.messages:

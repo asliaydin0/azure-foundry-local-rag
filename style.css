@@ -1059,14 +1059,46 @@ section[data-testid="stSidebar"] > div::-webkit-scrollbar {
 }
 
 /* Aktif sohbet satırı */
-[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.chat-history-row-active) + [data-testid="stElementContainer"] [data-testid="stButton"] button {
-    color: #D3CEE6 !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    font-weight: 500 !important;
-}
-
 [data-testid="stSidebar"] .chat-history-row-active {
     display: none !important;
+}
+
+/* Geçmiş sohbet — satır içi sil butonu */
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) [data-testid="column"]:last-child [data-testid="stButton"] button {
+    min-width: 32px !important;
+    width: 32px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    font-size: 0.75rem !important;
+    color: #9B93AD !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"]:has(.chat-history-scroll-inner) [data-testid="column"]:last-child [data-testid="stButton"] button:hover {
+    color: #FF6EC7 !important;
+    background: rgba(217, 38, 169, 0.1) !important;
+}
+
+/* Tüm geçmişi temizle */
+[data-testid="stSidebar"] .chat-history-clear-marker ~ div [data-testid="stButton"] button {
+    margin-top: 6px !important;
+    background: rgba(217, 38, 169, 0.08) !important;
+    border: 1px solid rgba(217, 38, 169, 0.35) !important;
+    color: #FF6EC7 !important;
+    font-size: 0.72rem !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-testid="stSidebar"] .chat-history-clear-marker ~ div [data-testid="stButton"] button:hover {
+    background: rgba(217, 38, 169, 0.16) !important;
+    border-color: rgba(217, 38, 169, 0.55) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 10px rgba(217, 38, 169, 0.2) !important;
 }
 
 /* =========================================================

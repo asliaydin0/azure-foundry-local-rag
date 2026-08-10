@@ -96,3 +96,30 @@ def list_chats() -> list:
 
     chats.sort(key=lambda c: c["updated_at"], reverse=True)
     return chats
+
+
+def delete_chat(chat_id: str) -> bool:
+    """Tek bir sohbet JSON dosyasını diskten kalıcı olarak siler."""
+    path = _chat_path(chat_id)
+    if not os.path.exists(path):
+        return False
+    try:
+        os.remove(path)
+        return True
+    except OSError:
+        return False
+
+
+def delete_all_chats() -> int:
+    """chats/ altındaki tüm sohbet JSON dosyalarını siler; silinen dosya sayısını döndürür."""
+    ensure_chats_dir()
+    deleted = 0
+    for fname in os.listdir(CHATS_DIR):
+        if not fname.endswith(".json"):
+            continue
+        try:
+            os.remove(os.path.join(CHATS_DIR, fname))
+            deleted += 1
+        except OSError:
+            continue
+    return deleted
