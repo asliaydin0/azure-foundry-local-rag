@@ -2,7 +2,7 @@
   "id": "20260809_134949_810722e5",
   "title": "işletim sistemi nedir?",
   "created_at": "2026-08-09T13:52:38",
-  "updated_at": "2026-08-09T13:56:53",
+  "updated_at": "2026-08-10T10:34:07",
   "messages": [
     {
       "role": "user",
@@ -19,6 +19,22 @@
     {
       "role": "assistant",
       "content": "CD/DVD veya USB disk kullanarak yükleyeceğin işletim sistemi:\n\n\nÖzet:\nBilgisayarın CD/DVD veya USB disk ile işletim sistemi yükleyeceğini belirtir, ancak desteklemeler gerektirir."
+    },
+    {
+      "role": "user",
+      "content": "işletim sisteminin kullanım alanları nerelerdir?"
+    },
+    {
+      "role": "assistant",
+      "content": "Bilgisayarda çalışan, bilgisayar donanımını yöneten ve ider yaygın servisleri sağlayan bir yazılımlar bütünüdü r. İşletim sistemi, özetle bilgisayardaki tüm donanımları, yazılımları ve dosya yönetimi alanında sorumludur.\n\n[İşletim Sistemi (Yönetici)]"
+    },
+    {
+      "role": "user",
+      "content": "işletim sisteminin görevleri neler?"
+    },
+    {
+      "role": "assistant",
+      "content": "İşletim sisteminin görevleri:\n\n1. **İlmeci Yönetimi**: Ana belleği yönetmek, yönetici yönetimindeki en yüksek yönetici olanın yönetiminde bulunmasıdır.\n2. **Harici Kayıt Cihazları Yönetimi**: Harici kayıt cihazlarını, yönetici yönetimindeki harici kayıt sistemi için yönetmek.\n3. **Giriş/Çıkış Kontrolü**: Giriş ve çıkış sistemi için kontrol sağlamak, yönetici yönetimindeki giriş ve çıkış sistemi için yönetiminde bulunmasıdır.\n4. **Bilgisayar Sistemi Güvenliği**: Bilgisayar sistemi için güvenliği sağlamak, yönetici yönetimindeki güvenlik sistemi için yönetiminde bulunmasıdır.\n5. **Dosya Yönetimi**"
     }
   ]
 }

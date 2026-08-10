@@ -15,6 +15,11 @@ CHAT_TIMEOUT_SECONDS = 120
 NO_CONTEXT_MESSAGE = (
     "⚠️ Sistem hafızasında bu soruyu yanıtlayacak uygun bir bağlam/belge bulunamadı."
 )
+SUGGESTED_PROMPTS = (
+    "Veri bilimi nedir?",
+    "Bu sistem nasıl çalışır?",
+    "Yüklediğim belgeler hakkında ne biliyorsun?",
+)
 MODEL_INIT_ERROR = "❌ Model başlatılamadı veya donanım yetersiz."
 
 # 1. Sayfa Tasarımı ve Temel Ayarlar
@@ -42,6 +47,8 @@ if "current_chat_id" not in st.session_state:
     st.session_state.current_chat_id = chat_history.create_chat_id()
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "pending_prompt" not in st.session_state:
+    st.session_state.pending_prompt = None
 
 # Bildirimler
 if st.session_state.son_yuklenen:
@@ -152,6 +159,7 @@ def _start_new_chat() -> None:
     _save_current_chat()
     st.session_state.current_chat_id = chat_history.create_chat_id()
     st.session_state.messages = []
+    st.session_state.pending_prompt = None
 
 
 def _load_chat_session(chat_id: str) -> None:
@@ -414,15 +422,42 @@ with st.sidebar:
                     _load_chat_session(sohbet["id"])
                     st.rerun()
 
-# 4. Ana Ekran Başlığı
-st.markdown('<h1 class="techlas-title">TechLas Workspace</h1>', unsafe_allow_html=True)
-st.markdown(
-    '<p class="techlas-subtitle">Yazılım mimarisi ve geliştirme veritabanı üzerinden çalışan kapalı devre sistem.</p>',
-    unsafe_allow_html=True,
-)
+# 4. Ana Ekran — başlık yalnızca aktif sohbette
+if st.session_state.messages:
+    st.markdown('<h1 class="techlas-title">TechLas Workspace</h1>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="techlas-subtitle">Yazılım mimarisi ve geliştirme veritabanı üzerinden çalışan kapalı devre sistem.</p>',
+        unsafe_allow_html=True,
+    )
 
 USER_AVATAR = "👤"
 ASSISTANT_AVATAR = "⚡"
+
+
+def render_welcome_empty_state() -> None:
+    st.markdown("""
+        <div class="welcome-empty-state">
+            <div class="welcome-empty-glow"></div>
+            <h2 class="welcome-empty-title">⚡ TechLas Workspace'e Hoş Geldiniz</h2>
+            <p class="welcome-empty-desc">
+                Yerel belgeleriniz üzerinde güvenli ve internetsiz arama yapın.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="prompt-chips-marker"></div>', unsafe_allow_html=True)
+    chip_cols = st.columns(len(SUGGESTED_PROMPTS))
+    for i, (col, oneri) in enumerate(zip(chip_cols, SUGGESTED_PROMPTS)):
+        with col:
+            if st.button(
+                oneri,
+                key=f"prompt_chip_{i}",
+                use_container_width=True,
+                type="secondary",
+                disabled=not model_hazir,
+            ):
+                st.session_state.pending_prompt = oneri
+                st.rerun()
 
 
 def render_chat_message(role: str, content: str) -> None:
@@ -431,18 +466,9 @@ def render_chat_message(role: str, content: str) -> None:
         st.markdown(f'<span class="chat-role-marker chat-role-{role}"></span>', unsafe_allow_html=True)
         st.markdown(content)
 
-# 5. Sohbet Geçmişi
-for msg in st.session_state.messages:
-    render_chat_message(msg["role"], msg["content"])
 
-# 6. RAG Sohbet
-if not model_hazir:
-    st.error(MODEL_INIT_ERROR)
-
-if prompt := st.chat_input(
-    "Veritabanında aramak istediğiniz konuyu yazın...",
-    disabled=not model_hazir,
-):
+def process_rag_prompt(prompt: str) -> None:
+    """Kullanıcı sorusunu RAG hattından geçirir ve sohbete ekler."""
     render_chat_message("user", prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -492,3 +518,31 @@ if prompt := st.chat_input(
 
             st.session_state.messages.append({"role": "assistant", "content": cevap})
             _save_current_chat()
+
+
+prompt_to_process = None
+if st.session_state.pending_prompt:
+    prompt_to_process = st.session_state.pending_prompt
+    st.session_state.pending_prompt = None
+
+# 5. Karşılama ekranı veya sohbet geçmişi
+if not st.session_state.messages and not prompt_to_process:
+    render_welcome_empty_state()
+
+for msg in st.session_state.messages:
+    render_chat_message(msg["role"], msg["content"])
+
+# 6. RAG Sohbet
+if not model_hazir:
+    st.error(MODEL_INIT_ERROR)
+
+chat_input_prompt = st.chat_input(
+    "Veritabanında aramak istediğiniz konuyu yazın...",
+    disabled=not model_hazir,
+)
+
+if prompt_to_process is None and chat_input_prompt:
+    prompt_to_process = chat_input_prompt
+
+if prompt_to_process and model_hazir:
+    process_rag_prompt(prompt_to_process)

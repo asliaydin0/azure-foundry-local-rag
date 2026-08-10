@@ -1,0 +1,16 @@
+{
+  "id": "20260810_153209_cf8c1a6d",
+  "title": "Yüklediğim belgeler hakkında ne biliyorsun?",
+  "created_at": "2026-08-10T15:37:18",
+  "updated_at": "2026-08-10T15:37:18",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Yüklediğim belgeler hakkında ne biliyorsun?"
+    },
+    {
+      "role": "assistant",
+      "content": "⚠️ Sistem hafızasında bu soruyu yanıtlayacak uygun bir bağlam/belge bulunamadı."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "20260810_153149_f1566876",
+  "title": "Bu sistem nasıl çalışır?",
+  "created_at": "2026-08-10T15:31:55",
+  "updated_at": "2026-08-10T15:31:55",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Bu sistem nasıl çalışır?"
+    },
+    {
+      "role": "assistant",
+      "content": "⚠️ Sistem hafızasında bu soruyu yanıtlayacak uygun bir bağlam/belge bulunamadı."
+    }
+  ]
+}
