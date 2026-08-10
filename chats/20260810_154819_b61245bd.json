@@ -1,0 +1,16 @@
+{
+  "id": "20260810_154819_b61245bd",
+  "title": "TechLas Workspace nedir?",
+  "created_at": "2026-08-10T15:49:08",
+  "updated_at": "2026-08-10T15:49:08",
+  "messages": [
+    {
+      "role": "user",
+      "content": "TechLas Workspace nedir?"
+    },
+    {
+      "role": "assistant",
+      "content": "TechLas Workspace, siberpunk temasında yerel yapay zeka asistanının hazırlık yeri, gizlilik ve yerel işbirim için tasarlanmış bir yazılım ortamıdır. Bu platform, yapay zeka modelleri, Phi-3.5-mini modeli ve RAG mimarisini kullanarak, kullanıcıların karmaşık soruları cevap verebilmelerini sağlamak için tasarlanmıştır. TechLas Workspace, yapay zeka ve yerel işbirim arasında yer alan bir yakından kararlanan yerli bir yakalama."
+    }
+  ]
+}
