@@ -1,25 +1,45 @@
 import numpy as np
 from foundry_local_sdk import FoundryLocalManager, Configuration
 
+PROJECT_NAME = "azure-foundry-local-rag"
+EMBEDDING_MODEL_ID = "qwen3-embedding-0.6b-generic-cpu:1"
+
+_embedder_instance = None
+
+
+def get_foundry_manager() -> FoundryLocalManager:
+    """SDK singleton kuralına uygun şekilde tek manager örneği döndürür."""
+    if FoundryLocalManager.instance is not None:
+        return FoundryLocalManager.instance
+    config = Configuration(PROJECT_NAME)
+    FoundryLocalManager.initialize(config)
+    return FoundryLocalManager.instance
+
+
+def get_local_embedder() -> "LocalEmbedder":
+    """Process içinde tek embedder örneği kullanılır (Streamlit rerun güvenli)."""
+    global _embedder_instance
+    if _embedder_instance is None:
+        _embedder_instance = LocalEmbedder()
+    return _embedder_instance
+
+
 class LocalEmbedder:
     def __init__(self):
         print("⚙️ Embedding (Vektörleme) motoru başlatılıyor...")
-        self.config = Configuration("azure-foundry-local-rag")
-        self.manager = FoundryLocalManager(self.config)
-        
-        # 1. Katalogdan doğru embedding modelini seçiyoruz
-        self.model_id = "qwen3-embedding-0.6b-generic-cpu:1"
+        self.manager = get_foundry_manager()
+
+        self.model_id = EMBEDDING_MODEL_ID
         modeller = self.manager.catalog.list_models()
         self.model = next((m for m in modeller if m.id == self.model_id), None)
-        
+
         if not self.model:
             raise ValueError(f"❌ '{self.model_id}' modeli katalogda bulunamadı!")
-            
+
         print(f"🧠 {self.model_id} hafızaya alınıyor (İlk seferde indirebilir)...")
         self.model.download()
         self.model.load()
-        
-        # 2. Vektör (Embedding) istemcisini başlatıyoruz
+
         self.client = self.model.get_embedding_client()
         print("✅ Embedding motoru hazır!")
 

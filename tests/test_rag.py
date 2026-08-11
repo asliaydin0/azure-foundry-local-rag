@@ -29,6 +29,14 @@ class TestIdentityDetection:
     def test_identity_questions_detected(self, prompt):
         assert is_identity_question(prompt) is True
 
+    def test_document_meta_question_skips_early_exit_without_context(self):
+        assert should_early_exit([], "Yüklediğim belgeler hakkında ne biliyorsun?") is False
+
+    def test_document_meta_question_detected(self):
+        from rag_logic import is_document_meta_question
+
+        assert is_document_meta_question("Yüklediğim belgeler hakkında ne biliyorsun?") is True
+
     def test_document_questions_not_treated_as_identity(self):
         assert is_identity_question("Yüklediğim belgeler hakkında ne biliyorsun?") is False
 
@@ -84,6 +92,27 @@ class TestExecuteRagQuery:
         messages = complete_fn.call_args.kwargs["messages"]
         assert "KİMLİK VE SİSTEM SORULARI" in messages[0]["content"]
 
+    def test_document_meta_question_calls_llm_without_early_exit(
+        self, mock_retriever, mock_chat_client
+    ):
+        mock_response = SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content="Henüz indekslenmiş belge yok."))]
+        )
+        complete_fn = MagicMock(return_value=mock_response)
+
+        result = execute_rag_query(
+            "Yüklediğim belgeler hakkında ne biliyorsun?",
+            mock_retriever,
+            mock_chat_client,
+            complete_fn,
+        )
+
+        assert result["route"] == "llm"
+        assert result["document_mode"] is True
+        complete_fn.assert_called_once()
+        messages = complete_fn.call_args.kwargs["messages"]
+        assert "BELGE / HAFIZA SORULARI" in messages[0]["content"]
+
     def test_unrelated_question_early_exit_without_llm(
         self, mock_retriever, mock_chat_client
     ):
@@ -104,6 +133,10 @@ class TestExecuteRagQuery:
     def test_identity_mode_prompt_allows_empty_context(self):
         prompt = build_rag_system_prompt("", identity_mode=True)
         assert "BAĞLAM boş olsa bile yanıt ver" in prompt
+
+    def test_document_mode_prompt_handles_empty_library(self):
+        prompt = build_rag_system_prompt("", document_mode=True)
+        assert "henüz indekslenmiş belge olmadığını" in prompt
 
     def test_normal_mode_prompt_requires_context(self):
         prompt = build_rag_system_prompt("Örnek bağlam", identity_mode=False)

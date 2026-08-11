@@ -1,0 +1,16 @@
+{
+  "id": "20260811_222303_6e944bbc",
+  "title": "Yüklediğim belgeler hakkında ne biliyorsun?",
+  "created_at": "2026-08-11T22:24:34",
+  "updated_at": "2026-08-11T22:24:34",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Yüklediğim belgeler hakkında ne biliyorsun?"
+    },
+    {
+      "role": "assistant",
+      "content": "Bağlam: Henüz belge yükleyemiyorum, bu yüzden bilgileri özetlemek için daha fazla bilgiye ihtiyacım var. Lütfen belge sağladığınızı bildirin, böylece daha doğru bilgi sağlamaya yardımcı olabilirim.\n\n(Belge sağlanırse de, belirtilen yanın içeriği içindeki belirtilen bilgi bulunuyor)\n\nBağlam:\n- Belirtilen bilgi: Lütfen belirtilen belgede\n\nBAĞLAM:\nLütfen belirtilen belgede sağlayın, böylece belirtilen bilgileri özetlemeye hazırlık yapabilirim.\n\n(Belirtilen bilgiler sağlanırse de, belirtilen bilgileri özetlemeye hazırlık yapılacak)\n\nBAĞLAM:\n(Belirtilen bilgiler özetlendiğinde)\n\nBAĞLAM:\nLütfen bel"
+    }
+  ]
+}

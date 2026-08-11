@@ -72,9 +72,12 @@ if st.session_state.son_gecmis_toast:
 
 # 2. AI Sistemi (Sidebar'dan önce — dosya işlemleri embedder gerektirir)
 @st.cache_resource
-def load_ai_system(_retriever_version: int = 3):
-    retriever = VectorRetriever()
-    manager = retriever.embedder.manager
+def load_ai_system(_retriever_version: int = 4):
+    from embedding import get_local_embedder
+
+    embedder = get_local_embedder()
+    retriever = VectorRetriever(embedder=embedder)
+    manager = embedder.manager
 
     hedef_model_id = "Phi-3.5-mini-instruct-generic-cpu:2"
     modeller = manager.catalog.list_models()

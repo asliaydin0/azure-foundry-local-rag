@@ -45,20 +45,35 @@ _DOCUMENT_QUESTION_PATTERNS = (
 )
 
 
+def is_document_meta_question(prompt: str) -> bool:
+    """Kullanıcının yüklediği belgeler / hafıza durumu hakkındaki sorular."""
+    text = prompt.lower().strip()
+    return any(re.search(p, text) for p in _DOCUMENT_QUESTION_PATTERNS)
+
+
 def is_identity_question(prompt: str) -> bool:
     """Asistan kimliği / sistem mimarisi sorularını tespit eder (belge soruları hariç)."""
     text = prompt.lower().strip()
-    if any(re.search(p, text) for p in _DOCUMENT_QUESTION_PATTERNS):
+    if is_document_meta_question(text):
         return False
     return any(re.search(p, text) for p in _IDENTITY_QUESTION_PATTERNS)
 
 
 def should_early_exit(search_results: list, prompt: str) -> bool:
-    """Arama sonucu yoksa ve kimlik sorusu değilse erken çıkış yapılır."""
-    return not search_results and not is_identity_question(prompt)
+    """Arama sonucu yoksa ve kimlik/belge meta sorusu değilse erken çıkış yapılır."""
+    if search_results:
+        return False
+    if is_identity_question(prompt) or is_document_meta_question(prompt):
+        return False
+    return True
 
 
-def build_rag_system_prompt(baglam_metni: str, identity_mode: bool = False) -> str:
+def build_rag_system_prompt(
+    baglam_metni: str,
+    *,
+    identity_mode: bool = False,
+    document_mode: bool = False,
+) -> str:
     if identity_mode:
         return f"""{_SYSTEM_IDENTITY}
 
@@ -71,6 +86,23 @@ YANIT FORMATI:
 
 BAĞLAM (varsa ek bilgi; kimlik sorularında zorunlu değil):
 {baglam_metni or "(Boş — kimlik/sistem sorusu)"}
+"""
+
+    if document_mode:
+        return f"""{_SYSTEM_IDENTITY}
+
+BELGE / HAFIZA SORULARI:
+Kullanıcı yüklediği belgeler veya hafızandaki bilgiler hakkında soru soruyor.
+- BAĞLAM doluysa yalnızca oradaki bilgilerle özet cevap ver.
+- BAĞLAM boşsa dürüstçe henüz indekslenmiş belge olmadığını söyle; sol panelden belge yükleyebileceğini kısaca belirt.
+- Bilgi uydurma; dosya adı veya meta etiket kullanma.
+
+YANIT FORMATI:
+- Cevabına doğrudan konuya girerek başla.
+- "Kaynak", "İçerik", "Belge" gibi meta etiketler kullanma.
+
+BAĞLAM:
+{baglam_metni or "(Boş — henüz indekslenmiş belge yok)"}
 """
 
     return f"""{_SYSTEM_IDENTITY}
@@ -108,6 +140,7 @@ def execute_rag_query(
     Dönüş: route (early_exit | llm), answer, sources, identity_mode
     """
     kimlik_sorusu = is_identity_question(prompt)
+    belge_sorusu = is_document_meta_question(prompt)
     bulunan_dokumanlar = retriever.search(prompt, top_k=top_k)
 
     if should_early_exit(bulunan_dokumanlar, prompt):
@@ -116,10 +149,15 @@ def execute_rag_query(
             "answer": NO_CONTEXT_MESSAGE,
             "sources": [],
             "identity_mode": False,
+            "document_mode": False,
         }
 
     baglam_metni = build_context(bulunan_dokumanlar) if bulunan_dokumanlar else ""
-    system_prompt = build_rag_system_prompt(baglam_metni, identity_mode=kimlik_sorusu)
+    system_prompt = build_rag_system_prompt(
+        baglam_metni,
+        identity_mode=kimlik_sorusu,
+        document_mode=belge_sorusu,
+    )
 
     response = complete_chat_fn(
         chat_client,
@@ -142,4 +180,5 @@ def execute_rag_query(
         "answer": cevap,
         "sources": bulunan_dokumanlar,
         "identity_mode": kimlik_sorusu,
+        "document_mode": belge_sorusu,
     }
