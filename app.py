@@ -3,7 +3,11 @@ import re
 import streamlit as st
 import os
 import html
-from retriever import VectorRetriever, build_context
+from retriever import VectorRetriever
+from rag_logic import (
+    NO_CONTEXT_MESSAGE,
+    execute_rag_query,
+)
 from document_manager import (
     delete_document,
     get_library_stats,
@@ -12,9 +16,6 @@ from document_manager import (
 import chat_history
 
 CHAT_TIMEOUT_SECONDS = 120
-NO_CONTEXT_MESSAGE = (
-    "⚠️ Sistem hafızasında bu soruyu yanıtlayacak uygun bir bağlam/belge bulunamadı."
-)
 SUGGESTED_PROMPTS = (
     "TechLas Workspace nedir?",
     "Bu sistem nasıl çalışır?",
@@ -129,85 +130,6 @@ def _sanitize_assistant_reply(text: str) -> str:
         cleaned = updated
     return cleaned
 
-
-_SYSTEM_IDENTITY = (
-    "Senin adın TechLas Workspace. İnternet bağlantısı olmadan, %100 yerel ve gizlilik odaklı "
-    "çalışan bir yapay zeka asistanısın. Phi-3.5-mini modeli ve RAG (Retrieval-Augmented Generation) "
-    "mimarisi üzerine inşa edildin. Kendi sistemin ve mimarin hakkındaki sorulara her zaman doğal, "
-    "yetkin ve siberpunk temasına uygun bir dille cevap ver."
-)
-
-_IDENTITY_QUESTION_PATTERNS = (
-    r"techlas",
-    r"tech\s*las",
-    r"\bworkspace\b",
-    r"sen\s+kimsin",
-    r"\bkimsin\b",
-    r"ne\s+(?:sin|sun|yaparsın|yapabilirsin)",
-    r"bu\s+sistem",
-    r"sistem\s+nasıl",
-    r"nasıl\s+çalış",
-    r"\brag\b",
-    r"phi[\-\s]?3",
-    r"yerel.*asistan",
-    r"kendini\s+tanıt",
-    r"hangi\s+model",
-    r"mimari",
-    r"kapalı\s+devre",
-    r"internetsiz",
-)
-
-_DOCUMENT_QUESTION_PATTERNS = (
-    r"yüklediğim\s+belge",
-    r"belgelerim",
-    r"yüklediğim\s+dosya",
-    r"hafızandaki\s+belge",
-    r"kaynaklarım",
-    r"ne\s+biliyorsun",
-)
-
-
-def _is_identity_question(prompt: str) -> bool:
-    """Asistan kimliği / sistem mimarisi sorularını tespit eder (belge soruları hariç)."""
-    text = prompt.lower().strip()
-    if any(re.search(p, text) for p in _DOCUMENT_QUESTION_PATTERNS):
-        return False
-    return any(re.search(p, text) for p in _IDENTITY_QUESTION_PATTERNS)
-
-
-def _build_rag_system_prompt(baglam_metni: str, identity_mode: bool = False) -> str:
-    if identity_mode:
-        return f"""{_SYSTEM_IDENTITY}
-
-KİMLİK VE SİSTEM SORULARI:
-Kullanıcı TechLas Workspace, senin kimliğin veya sistem mimarin hakkında soru soruyor. Yukarıdaki kimliğini ve yerel RAG mimarisini kullanarak doğal, akıcı ve siberpunk temasında Türkçe cevap ver. BAĞLAM boş olsa bile yanıt ver; kendini tanıt ve sistemi açıkla.
-
-YANIT FORMATI:
-- Cevabına doğrudan konuya girerek başla.
-- "Kaynak", "İçerik", "Belge" gibi meta etiketler kullanma.
-
-BAĞLAM (varsa ek bilgi; kimlik sorularında zorunlu değil):
-{baglam_metni or "(Boş — kimlik/sistem sorusu)"}
-"""
-
-    return f"""{_SYSTEM_IDENTITY}
-
-GÖREVİN:
-Kullanıcının sorusunu YALNIZCA aşağıdaki BAĞLAM bölümündeki bilgilerle cevapla.
-
-KESİN KURALLAR (İHLAL EDİLEMEZ):
-1. Bağlamda cevap yoksa SADECE şunu yaz: "Üzgünüm, mevcut veritabanımda bu konu hakkında bir bilgi bulunmuyor."
-2. Tahmin yürütme, bilgi uydurma, parçaları birleştirip çıkarım yapma.
-3. YANIT FORMATI — ÇOK ÖNEMLİ:
-   - Cevabına DOĞRUDAN konuya girerek başla. İlk cümle sorunun cevabı olsun.
-   - "Kaynak", "İçerik", "Belge", "Context", "Source", "Content" kelimelerini ASLA yazma.
-   - Dosya adı, uzantı (.pdf, .docx), parça numarası veya meta etiket KULLANMA.
-   - Bağlamdaki etiketleri, başlıkları veya yapıyı cevaba KOPYALAMA.
-   - Kaynaklar arayüzde ayrı gösterilir; sen sadece doğal, akıcı Türkçe cevap ver.
-
-BAĞLAM (iç yapıyı kullanıcıya yansıtma):
-{baglam_metni}
-"""
 
 with st.spinner("Sistem başlatılıyor..."):
     retriever, chat_client = load_ai_system()
@@ -576,37 +498,28 @@ def process_rag_prompt(prompt: str) -> None:
     with st.chat_message("assistant", avatar=ASSISTANT_AVATAR):
         st.markdown('<span class="chat-role-marker chat-role-assistant"></span>', unsafe_allow_html=True)
         with st.spinner("Veriler analiz ediliyor..."):
-            kimlik_sorusu = _is_identity_question(prompt)
-            bulunan_dokumanlar = retriever.search(prompt, top_k=2)
-
-            if not bulunan_dokumanlar and not kimlik_sorusu:
-                cevap = NO_CONTEXT_MESSAGE
-                st.warning(cevap)
-            else:
-                baglam_metni = build_context(bulunan_dokumanlar) if bulunan_dokumanlar else ""
-                system_prompt = _build_rag_system_prompt(
-                    baglam_metni,
-                    identity_mode=kimlik_sorusu,
-                )
-
-                try:
-                    response = complete_chat_with_timeout(
-                        chat_client,
-                        messages=[
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": prompt},
-                        ],
+            try:
+                def _complete_with_timeout(client, messages):
+                    return complete_chat_with_timeout(
+                        client,
+                        messages,
                         timeout=CHAT_TIMEOUT_SECONDS,
                     )
 
-                    if hasattr(response, "choices"):
-                        cevap = response.choices[0].message.content
-                    else:
-                        cevap = str(response)
+                sonuc = execute_rag_query(
+                    prompt,
+                    retriever,
+                    chat_client,
+                    _complete_with_timeout,
+                    sanitize_reply_fn=_sanitize_assistant_reply,
+                )
+                cevap = sonuc["answer"]
+                bulunan_dokumanlar = sonuc["sources"]
 
-                    cevap = _sanitize_assistant_reply(cevap)
+                if sonuc["route"] == "early_exit":
+                    st.warning(cevap)
+                else:
                     st.markdown(cevap)
-
                     if bulunan_dokumanlar:
                         with st.expander("📎 Kaynak Detayları", expanded=False):
                             for i, doc in enumerate(bulunan_dokumanlar):
@@ -617,10 +530,9 @@ def process_rag_prompt(prompt: str) -> None:
                                     f'</div>',
                                     unsafe_allow_html=True,
                                 )
-
-                except Exception as e:
-                    cevap = _chat_hata_mesaji(e)
-                    st.warning(cevap)
+            except Exception as e:
+                cevap = _chat_hata_mesaji(e)
+                st.warning(cevap)
 
             st.session_state.messages.append({"role": "assistant", "content": cevap})
             _save_current_chat()

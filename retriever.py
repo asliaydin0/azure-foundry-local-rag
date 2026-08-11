@@ -1,6 +1,5 @@
 import sqlite3
 import numpy as np
-from embedding import LocalEmbedder
 from database import DB_NAME
 
 MAX_CHUNK_CHARS = 500
@@ -51,9 +50,13 @@ def build_context(documents: list) -> str:
 
 
 class VectorRetriever:
-    def __init__(self):
+    def __init__(self, embedder=None):
         print("🔍 Arama motoru başlatılıyor...")
-        self.embedder = LocalEmbedder()
+        if embedder is not None:
+            self.embedder = embedder
+        else:
+            from embedding import LocalEmbedder
+            self.embedder = LocalEmbedder()
         
     def search(self, query: str, top_k: int = 2, min_score: float = SIMILARITY_THRESHOLD):
         """Kullanıcının sorusuna en uygun 'top_k' sayıdaki dökümanı bulur."""
