@@ -7,6 +7,10 @@ TechLas Workspace, **Microsoft Foundry Local** üzerinde çalışan, tamamen **�
 Synthwave/Cyberpunk arayüzü, geçmiş sohbet yönetimi ve katı anti-halüsinasyon kurallarıyla **üretim kalitesinde** bir yerel bilgi asistanı deneyimi sunar.
 
 ---
+<img width="1917" height="1078" alt="image" src="https://github.com/user-attachments/assets/47fe1cb8-9e6c-4bf9-85bd-da26774383aa" />
+
+<img width="1917" height="1078" alt="image" src="https://github.com/user-attachments/assets/d6b5ee9d-900f-4188-9fe2-00b6c96898be" />
+
 
 ## 🧠 Proje Özeti
 
